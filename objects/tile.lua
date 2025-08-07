@@ -96,14 +96,14 @@ local function getNoiseBiome(x, y)
     -- Lower scale = larger islands
     local scale = 0.03
     local n = love.math.noise(x * scale + Game.noiseSeed, y * scale + Game.noiseSeed)
-    if n < 0.125 then
-        return "tundra"
-    elseif n < 0.5 then
-        return "grassland"
-	elseif n < 0.625 then
+    if n < 0.25 then
+        return "ocean"
+    elseif n < 0.375 then
         return "beach"
+	elseif n < 0.875 then
+        return "grassland"
 	elseif n < 1 then
-		return "ocean"
+		return "tundra"
     end
 end
 
