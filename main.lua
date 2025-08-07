@@ -1,3 +1,4 @@
+tileSize = 75
 love.window.setMode(1200, 900)
 
 local StateManager = require("handlers.stateManager")
@@ -17,8 +18,6 @@ local stateModules = {
 
 function love.load()
 	windowWidth, windowHeight = love.graphics.getDimensions()
-	windowScale = 1
-	tileSize = 75
 
 	require("game")
 	
@@ -27,7 +26,7 @@ function love.load()
 	for key, path in pairs(stateModules) do
 		local stateObj = require(path)
 		Game.states[key] = stateObj
-		Game.stateManager:add(key, require(path))
+		Game.stateManager:add(key, stateObj)
 	end
 	
 	tileX = 0

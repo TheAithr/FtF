@@ -27,6 +27,7 @@ function Player.new()
 end
 
 function Player:update(dt)
+	print("current state: ", Game.stateManager.currentID)
 	if Game.stateManager.currentID == "explore" then
 		local biome = "grassland"
 		if tile and tile.biome then

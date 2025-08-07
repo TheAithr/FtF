@@ -19,6 +19,10 @@ local explore = {
 	player = Player.new()
 }
 
+function explore:enter()
+
+end
+
 function explore:update(dt)
 	Game.states.explore.player:update(dt)
 
