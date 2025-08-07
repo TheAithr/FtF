@@ -33,7 +33,7 @@ function stateManager:switch(name, ...)
 end
 
 function stateManager:update(dt)
-	if self.current then
+	if self.current and self.current.update then
 		self.current:update(dt)
 	end
 end

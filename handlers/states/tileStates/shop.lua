@@ -121,7 +121,7 @@ end
 
 function shop:keypressed(key, scancode)
 	if scancode == "backspace" then
-		Game.stateManager:switch("explore")
+		tile:clear()
 	end
 end
 
