@@ -42,13 +42,6 @@ function love.update(dt)
 	tile = Game:getTile(tileX, tileY)
 	Game.stateManager:update(dt)
 	
-	Game.states.explore.camera:centerOn(Game.states.explore.player.x, Game.states.explore.player.y, windowWidth, windowHeight)
-
-	Game.states.explore.visibleTileBounds.minX = math.floor(Game.states.explore.camera.x / tileSize)
-	Game.states.explore.visibleTileBounds.maxX = math.ceil((Game.states.explore.camera.x + windowWidth) / tileSize)
-	Game.states.explore.visibleTileBounds.minY = math.floor(Game.states.explore.camera.y / tileSize)
-	Game.states.explore.visibleTileBounds.maxY = math.ceil((Game.states.explore.camera.y + windowHeight) / tileSize)
-	
 	if Game.stateManager.current == Game.stateManager.states["explore"] then
         local camX = Game.states.explore.player.x - windowWidth / 2
         local camY = Game.states.explore.player.y - windowHeight / 2

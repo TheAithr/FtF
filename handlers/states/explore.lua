@@ -23,7 +23,13 @@ function explore:enter()
 
 end
 
-function explore:update(dt)
+function explore:update(dt)	
+	Game.states.explore.visibleTileBounds.minX = math.floor(Game.states.explore.camera.x / tileSize)
+	Game.states.explore.visibleTileBounds.maxX = math.ceil((Game.states.explore.camera.x + windowWidth) / tileSize)
+	Game.states.explore.visibleTileBounds.minY = math.floor(Game.states.explore.camera.y / tileSize)
+	Game.states.explore.visibleTileBounds.maxY = math.ceil((Game.states.explore.camera.y + windowHeight) / tileSize)
+	Game.states.explore.camera:centerOn(Game.states.explore.player.x, Game.states.explore.player.y, windowWidth, windowHeight)
+
 	Game.states.explore.player:update(dt)
 
 	local bounds = Game.states.explore.visibleTileBounds

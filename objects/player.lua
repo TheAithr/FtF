@@ -29,12 +29,8 @@ end
 function Player:update(dt)
 	print("current state: ", Game.stateManager.currentID)
 	if Game.stateManager.currentID == "explore" then
-		local biome = "grassland"
-		if tile and tile.biome then
-			biome = tile.biome
-		end
 		local speed
-		if biome == "ocean" then
+		if tile.biome == "ocean" then
 			speed = self.stats.movespeed * 0.75
 		else
 			speed = self.stats.movespeed
