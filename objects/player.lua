@@ -29,11 +29,12 @@ function Player:update(dt)
 	print("current state: ", Game.stateManager.currentID)
 	if Game.stateManager.currentID == "explore" then
 		local speed
-		if tile.biome == "ocean" then
-			speed = self.stats.movespeed * 0.75
-		else
-			speed = self.stats.movespeed
+		for _,b in pairs(biomeList) do
+			if b.name == tile.biome then
+				speedMult = b.speedMult
+			end
 		end
+		speed = self.stats.movespeed * speedMult
 		
 		if love.keyboard.isDown("a") then
 			self.x = self.x - speed * dt

@@ -1,7 +1,7 @@
 local Tile = {}
 Tile.__index = Tile
 
-local biomeList = {
+biomeList = {
 	oceanBiome = {
 		name = "ocean",
 		color = {0.2, 0.5, 1, 1},
@@ -67,7 +67,7 @@ local biomeList = {
 		color = {1, 1, 1, 1},
 		speedMult = 1,
 		states = {
-			{name="empty", weight=750},
+			{name="empty", weight=1500},
 			{name="combat", weight=75},
 			{name="shop", weight=20},
 			{name="treasure", weight=20}
@@ -138,7 +138,7 @@ local function getNoiseBiome(x, y)
 	local nGrassland = love.math.noise(x * scaleGrassland + Game.noiseSeed, y * scaleGrassland + Game.noiseSeed)
 	local nOcean = love.math.noise(x * scaleOcean + Game.noiseSeed, y * scaleOcean + Game.noiseSeed)
     if n < 0.2 then
-        if nOcean < 0.5 then
+        if nOcean < 0.3 then
 			return "deepOcean"
 		elseif nOcean < 1 then
 			return "ocean"
