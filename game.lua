@@ -1,6 +1,5 @@
 Button = require("objects.UI.button")
 Item = require("objects.item")
-Item:init()
 Player = require("objects.player")
 Tile = require("objects.tile")
 Camera = require("objects.camera")

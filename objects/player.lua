@@ -21,7 +21,6 @@ function Player.new()
 	}
 	
 	self.inventory = {}
-	Item:createItems(self.inventory)
 
 	return self
 end

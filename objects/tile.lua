@@ -1,32 +1,78 @@
 local Tile = {}
 Tile.__index = Tile
 
-local tundraStates = {
-	{name="empty", weight=750},
-	{name="combat", weight=75},
-	{name="shop", weight=20},
-	{name="treasure", weight=20}
-}
+local biomeList = {
+	oceanBiome = {
+		name = "ocean",
+		color = {0.2, 0.5, 1, 1},
+		speedMult = 0.75,
+		states = {
+			{name="empty", weight=1000},
+			{name="combat", weight=200},
+			{name="shop", weight=0},
+			{name="treasure", weight=25}
+		}
+	},
 
-local grasslandStates = {
-	{name="empty", weight=1000},
-	{name="combat", weight=100},
-	{name="shop", weight=10},
-	{name="treasure", weight=10}
-}
+	deepOceanBiome = {
+		name = "deepOcean",
+		color = {0, 0, 1, 1},
+		speedMult = 0.75,
+		states = {
+			{name="empty", weight=1000},
+			{name="combat", weight=400},
+			{name="shop", weight=0},
+			{name="treasure", weight=50}
+		}
+	},
 
-local beachStates = {
-	{name="empty", weight=700},
-	{name="combat", weight=70},
-	{name="shop", weight=0},
-	{name="treasure", weight=30}
-}
+	beachBiome = {
+		name = "beach",
+		color = {1, 1, 0, 1},
+		speedMult = 1,
+		states = {
+			{name="empty", weight=1000},
+			{name="combat", weight=0},
+			{name="shop", weight=0},
+			{name="treasure", weight=30}
+		}
+	},
 
-local oceanStates = {
-	{name="empty", weight=1000},
-	{name="combat", weight=200},
-	{name="shop", weight=0},
-	{name="treasure", weight=25}
+	grasslandBiome = {
+		name = "grassland",
+		color = {0, 1, 0, 1},
+		speedMult = 1,
+		states = {
+			{name="empty", weight=1000},
+			{name="combat", weight=100},
+			{name="shop", weight=10},
+			{name="treasure", weight=10}
+		}
+	},
+
+	forestBiome = {
+		name = "forest",
+		color = {0.1, 0.8, 0.1, 1},
+		speedMult = 1,
+		states = {
+			{name="empty", weight=1000},
+			{name="combat", weight=150},
+			{name="shop", weight=20},
+			{name="treasure", weight=0}
+		}
+	},
+
+	tundraBiome = {
+		name = "tundra",
+		color = {1, 1, 1, 1},
+		speedMult = 1,
+		states = {
+			{name="empty", weight=750},
+			{name="combat", weight=75},
+			{name="shop", weight=20},
+			{name="treasure", weight=20}
+		}
+	}
 }
 
 function Tile.new(x, y, baseBiome)
@@ -39,31 +85,22 @@ function Tile.new(x, y, baseBiome)
     self.x = self.xCoor * self.width
     self.y = self.yCoor * self.height
 	
-	self.baseBiome = baseBiome
 	self.biome = self:rollBiome() or "grassland"
 
-	if self.biome == "tundra" then
-		self.state = Random.weightedRoll(tundraStates)
-	elseif self.biome == "grassland" then
-		self.state = Random.weightedRoll(grasslandStates)
-	elseif self.biome == "beach" then
-		self.state = Random.weightedRoll(beachStates)
-	elseif self.biome == "ocean" then
-		self.state = Random.weightedRoll(oceanStates)
+	for _,b in pairs(biomeList) do
+		if self.biome == b.name then
+			self.state = Random.weightedRoll(b.states)
+		end
 	end
 	
     return self
 end
 
 function Tile:draw()
-	if self.biome == "tundra" then
-		love.graphics.setColor(1, 1, 1, 1)
-	elseif self.biome == "grassland" then
-		love.graphics.setColor(0, 1, 0, 1)
-	elseif self.biome == "beach" then
-		love.graphics.setColor(1, 1, 0, 1)
-	elseif self.biome == "ocean" then
-		love.graphics.setColor(0, 0, 1, 1)
+	for _,b in pairs(biomeList) do
+		if self.biome == b.name then
+			love.graphics.setColor(b.color)
+		end
 	end
 	love.graphics.rectangle("fill", self.x, self.y, self.width - 0.5, self.height - 0.5)
 
@@ -95,13 +132,25 @@ end
 local function getNoiseBiome(x, y)
     -- Lower scale = larger islands
     local scale = 0.03
+	local scaleGrassland = 0.05
+	local scaleOcean = 0.05
     local n = love.math.noise(x * scale + Game.noiseSeed, y * scale + Game.noiseSeed)
-    if n < 0.25 then
-        return "ocean"
-    elseif n < 0.375 then
+	local nGrassland = love.math.noise(x * scaleGrassland + Game.noiseSeed, y * scaleGrassland + Game.noiseSeed)
+	local nOcean = love.math.noise(x * scaleOcean + Game.noiseSeed, y * scaleOcean + Game.noiseSeed)
+    if n < 0.2 then
+        if nOcean < 0.5 then
+			return "deepOcean"
+		elseif nOcean < 1 then
+			return "ocean"
+		end
+    elseif n < 0.4 then
         return "beach"
 	elseif n < 0.875 then
-        return "grassland"
+		if nGrassland < 0.5 then
+			return "grassland"
+		elseif nGrassland < 1 then
+			return "forest"
+		end
 	elseif n < 1 then
 		return "tundra"
     end
