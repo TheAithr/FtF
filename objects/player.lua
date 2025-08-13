@@ -8,19 +8,56 @@ function Player.new()
 	self.y = love.math.random(-100, 100) * tileSize
 	self.width = 50
 	self.height = 50
+
+	self.level = 1
+	self.xp = 0
+	self.points = 1
 	
 	self.stats = {
 		movespeed = 200,
 		maxHealth = 100,
-		health = 100,
 		damage = 10,
 		critRate = 0,
 		critDamage = 2,
 		armor = 0,
-		lifesteal = 0
+		lifesteal = 0, 
+		dodge = 0
 	}
-	
-	self.inventory = {}
+
+	self.hp = self.stats.maxHealth or 100
+
+	self.statNames = {
+		movespeed = "Movespeed",
+		maxHealth = "Max Health",
+		damage = "Base Damage",
+		critRate = "Crit Chance",
+		critDamage = "Crit Damage",
+		armor = "Defence",
+		lifesteal = "Lifesteal",
+		dodge = "Dodge Chance"
+	}
+
+	self.perLevel = {
+		movespeed = 5,
+		maxHealth = 10,
+		damage = 0.5,
+		critRate = 1,
+		critDamage = 0,
+		armor = 0.1,
+		lifesteal = 0.5,
+		dodge = 0.1
+	}
+
+	self.skillPoints = {
+		movespeed = 0,
+		maxHealth = 0,
+		damage = 0,
+		critRate = 0,
+		critDamage = 0,
+		armor = 0,
+		lifesteal = 0,
+		dodge = 0
+	}
 
 	return self
 end
@@ -70,6 +107,21 @@ function Player:updateStats()
 	self.stats.critDamage = 2
 	self.stats.armor = 0
 	self.stats.lifesteal = 0
+	self.stats.dodge = 0
+
+	while self.xp >= 100 do
+		self.xp = self.xp - 100
+		self.level = self.level + 1
+		if self.level % 5 == 0 then
+			self.points = self.points + 3
+		else
+			self.points = self.points + 1
+		end
+	end
+
+	for stat, base in pairs(self.stats) do
+        self.stats[stat] = base + (self.perLevel[stat] * self.skillPoints[stat])
+    end
 end
 
 return Player

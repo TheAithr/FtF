@@ -23,13 +23,13 @@ function Button.new(x, y, width, height, text)
 	return self
 end
 
+function Button:contains(x, y)
+	return x > self.x and x < self.x + self.width and y > self.y and y < self.y + self.height
+end
+
 function Button:update()
 	local mx, my = love.mouse.getPosition()
 	self.hovered = self:contains(mx, my)
-end
-
-function Button:contains(x, y)
-	return x > self.x and x < self.x + self.width and y > self.y and y < self.y + self.height
 end
 
 function Button:mousepressed(x, y, button)

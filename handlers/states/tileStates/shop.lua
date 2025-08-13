@@ -1,5 +1,4 @@
 require("game")
-local Item = require("objects.item")
 
 local miyabi = love.graphics.newImage("assets/miyabi.png")
 local newt = love.graphics.newImage("assets/newt.png")
@@ -72,7 +71,7 @@ function shop:mousepressed(x, y, button)
 	and Game.states.shop.item1.button:mousepressed(x, y, button)
 	and Game.states.explore.gold >= Game.states.shop.item1.cost then
 		
-		Item:addStack(Game.states.shop.item1.item, Game.states.explore.player.inventory)
+		-- Item:addStack(Game.states.shop.item1.item, Game.states.explore.player.inventory)
 		Game.states.explore.gold = Game.states.explore.gold - Game.states.shop.item1.cost
 		Game.states.shop.item1 = nil
 		Game.states.shop.item1Bought = true
@@ -82,7 +81,7 @@ function shop:mousepressed(x, y, button)
 	and Game.states.shop.item2.button:mousepressed(x, y, button)
 	and Game.states.explore.gold >= Game.states.shop.item2.cost then
 		
-		Item:addStack(Game.states.shop.item2.item, Game.states.explore.player.inventory)
+		-- Item:addStack(Game.states.shop.item2.item, Game.states.explore.player.inventory)
 		Game.states.explore.gold = Game.states.explore.gold - Game.states.shop.item2.cost
 		Game.states.shop.item2 = nil
 		Game.states.shop.item2Bought = true
@@ -92,7 +91,7 @@ function shop:mousepressed(x, y, button)
 	and Game.states.shop.item3.button:mousepressed(x, y, button)
 	and Game.states.explore.gold >= Game.states.shop.item3.cost then
 		
-		Item:addStack(Game.states.shop.item3.item, Game.states.explore.player.inventory)
+		-- Item:addStack(Game.states.shop.item3.item, Game.states.explore.player.inventory)
 		Game.states.explore.gold = Game.states.explore.gold - Game.states.shop.item3.cost
 		Game.states.shop.item3 = nil
 		Game.states.shop.item3Bought = true

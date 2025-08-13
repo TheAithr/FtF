@@ -9,9 +9,9 @@ local combat = {
 	run = Button.new(windowWidth - 105, windowHeight - 140, 100, 25, "Run Away"),
 
 	enemy = {
+		hp = 50,
 		stats = {
 		maxHealth = 50,
-		health = 50,
 		damage = 10,
 		critRate = 0,
 		critDamage = 2,
@@ -21,7 +21,7 @@ local combat = {
 	}
 }
 
-baseStats = {
+local baseStats = {
 	maxHealth = 50,
 	damage = 10,
 	critRate = 0,
@@ -30,7 +30,7 @@ baseStats = {
 	lifesteal = 0
 }
 
-scaling = {
+local scaling = {
 	maxHealth = 8,
 	damage = 0.5,
 	critRate = 1,
@@ -47,34 +47,41 @@ function combat:enter()
 	local enemy = Game.states.combat.enemy
 
 	for stat, base in pairs(baseStats) do
-        enemy[stat] = base + (scaling[stat] * Game.states.explore.tilesCleared)
+        enemy.stats[stat] = base + (scaling[stat] * Game.states.explore.tilesCleared)
     end
 
-	if enemy.critRate >= 100 then
-		enemy.critRate = 100
+	if enemy.stats.critRate >= 100 then
+		enemy.stats.critRate = 100
 	end
 	
-	enemy.maxHealth = math.floor(enemy.maxHealth)
+	enemy.stats.maxHealth = math.floor(enemy.stats.maxHealth)
 	
-    enemy.health = enemy.maxHealth or 100
-	player.health = player.maxHealth or 100
+    enemy.hp = enemy.stats.maxHealth or 100
+	player.hp = player.stats.maxHealth or 100
 end
 
 function combat:leave()   
-	Game.states.combat.enemy.stats.health = Game.states.combat.enemy.stats.maxHealth or 100
-	Game.states.explore.player.stats.health = Game.states.explore.player.stats.maxHealth or 100
+	Game.states.combat.enemy.hp = Game.states.combat.enemy.stats.maxHealth or 100
+	Game.states.explore.player.hp = Game.states.explore.player.stats.maxHealth or 100
+end
+
+function combat:cleared()
+	tile:clear()
+	local random = require("lib.random")
+	Game.states.explore.gold = Game.states.explore.gold + random.tileRoll()
+	Game.states.explore.player.xp = Game.states.explore.player.xp + 5 * Game.states.explore.tilesCleared
+	Game.states.explore.player:updateStats()
 end
 
 function combat:update(dt)
-	if Game.states.combat.enemy.health <= 0 then
+	if Game.states.combat.enemy.hp <= 0 then
         local tileX = math.floor(Game.states.explore.player.x / Game.states.explore.tileSize)
         local tileY = math.floor(Game.states.explore.player.y / Game.states.explore.tileSize)
         local tile = Game:getTile(tileX, tileY)
 
         if tile 
 		and not tile.cleared then
-            tile:clear()
-			Game.states.explore.gold = Game.states.explore.gold + love.math.random(math.min(math.abs(tileX), math.abs(tileY)), math.max(math.abs(tileX), math.abs(tileY)))
+            self:cleared()
         end
     end
 end
@@ -132,7 +139,7 @@ function combat:drawEnemyHealth()
 	local barHeight = 20
 	local x = (windowWidth - barWidth) / 2
 	local y = 30
-	local healthPercent = math.max(Game.states.combat.enemy.stats.health / Game.states.combat.enemy.stats.maxHealth, 0)
+	local healthPercent = math.max(Game.states.combat.enemy.hp / Game.states.combat.enemy.stats.maxHealth, 0)
 
 	love.graphics.setColor(0.2, 0.2, 0.2, 1)
 	love.graphics.rectangle("fill", x, y, barWidth, barHeight)
@@ -144,7 +151,7 @@ function combat:drawEnemyHealth()
 	love.graphics.rectangle("line", x, y, barWidth, barHeight)
 
 	love.graphics.setColor(1, 1, 1, 1)
-	love.graphics.printf("Enemy HP: " .. Game.states.combat.enemy.stats.health .. "/" .. Game.states.combat.enemy.stats.maxHealth, x, y + barHeight + 5, barWidth, "center")
+	love.graphics.printf("Enemy HP: " .. Game.states.combat.enemy.hp .. "/" .. Game.states.combat.enemy.stats.maxHealth, x, y + barHeight + 5, barWidth, "center")
 end
 
 function combat:drawEnemyStats()
@@ -157,11 +164,13 @@ function combat:drawEnemyStats()
 end
 
 function combat:drawPlayerHealth()
+	local player = Game.states.explore.player
+
 	local barWidth = 300
 	local barHeight = 20
 	local x = (windowWidth - barWidth) / 2
 	local y = windowHeight - 150
-	local healthPercent = math.max(Game.states.explore.player.stats.health / Game.states.explore.player.stats.maxHealth, 0)
+	local healthPercent = math.max(player.hp / player.stats.maxHealth, 0)
 	
 	love.graphics.setColor(0.2, 0.2, 0.2, 1)
 	love.graphics.rectangle("fill", x, y, barWidth, barHeight)
@@ -173,7 +182,7 @@ function combat:drawPlayerHealth()
 	love.graphics.rectangle("line", x, y, barWidth, barHeight)
 
 	love.graphics.setColor(1, 1, 1, 1)
-	love.graphics.printf("Player HP: " .. Game.states.explore.player.stats.health .. "/" .. Game.states.explore.player.stats.maxHealth, x, y + barHeight + 5, barWidth, "center")
+	love.graphics.printf("Player HP: " .. player.hp .. "/" .. player.stats.maxHealth, x, y + barHeight + 5, barWidth, "center")
 end
 
 function combat:turnHandler(action)
@@ -204,31 +213,31 @@ end
 function combat.damageCalc(user, target)
 	local critRoll = love.math.random(100)
 	if critRoll <= user.stats.critRate then
-		target.stats.health = target.stats.health - user.stats.critDamage * (math.max(user.stats.damage - target.stats.armor, 1))
+		target.hp = target.hp - user.stats.critDamage * (math.max(user.stats.damage - target.stats.armor, 1))
 		if user.stats.lifesteal > 0 then
-			user.stats.health = math.min(user.stats.health + user.stats.critDamage * user.stats.lifesteal, user.stats.maxHealth)
+			user.hp = math.min(user.hp + user.stats.critDamage * user.stats.lifesteal, user.stats.maxHealth)
 		end
 	else
-		target.stats.health = target.stats.health - math.max(user.stats.damage - target.stats.armor, 1)
+		target.hp = target.hp - math.max(user.stats.damage - target.stats.armor, 1)
 		if user.stats.lifesteal > 0 then
-			user.stats.health = math.min(user.stats.health + user.stats.lifesteal, user.stats.maxHealth)
+			user.hp = math.min(user.hp + user.stats.lifesteal, user.stats.maxHealth)
 		end
 	end
 end
 
 function combat.healCalc(user)
-	user.stats.health = math.min(user.stats.health + user.stats.maxHealth / 10, user.stats.maxHealth)
+	user.hp = math.min(user.hp + user.stats.maxHealth / 10, user.stats.maxHealth)
 end
 
 function combat:checkPlayerDeath()
-	if Game.states.explore.player.stats.health <= 0 then
+	if Game.states.explore.player.hp <= 0 then
 		Game.stateManager:switch("death")
 	end
 end
 
 function combat:checkEnemyDeath()
-	if Game.states.combat.enemy.stats.health <= 0 then
-		tile:clear()
+	if Game.states.combat.enemy.hp <= 0 then
+		self:cleared()
 	end
 end
 	

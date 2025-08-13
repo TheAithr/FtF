@@ -62,10 +62,6 @@ function explore:draw()
 	love.graphics.print("X: " .. tileX, 10, 25)
 	love.graphics.print("Y: " .. -tileY, 10, 40)
 	love.graphics.print("tiles cleared: " .. Game.states.explore.tilesCleared, 10, 55)
-	love.graphics.setColor(0, 0, 0, 1)
-	love.graphics.print("n: " .. tile.n, 10, 70)
-	love.graphics.print("n2: " .. tile.n2, 10, 85)
-	love.graphics.setColor(1, 1, 1, 1)
 end
 
 function explore:keypressed(key, scancode)

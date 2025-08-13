@@ -1,5 +1,4 @@
 require("game")
-local Item = require("objects.item")
 
 local treasure = {
 	exit = Button.new(windowWidth - 55, 5, 50, 25, "EXIT"),
@@ -36,7 +35,7 @@ function treasure:keypressed(key, scancode)
 end
 
 function treasure:openChest()
-	Item:generateItem(Game.states.explore.player.inventory)
+	-- Item:generateItem(Game.states.explore.player.inventory)
 	tile:clear()
 end
 	

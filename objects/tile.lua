@@ -11,7 +11,7 @@ biomeList = {
 		states = {
 			{name="empty", weight=1000},
 			{name="combat", weight=200},
-			{name="shop", weight=0},
+			-- {name="shop", weight=10},
 			{name="treasure", weight=25}
 		}
 	},
@@ -25,7 +25,7 @@ biomeList = {
 		states = {
 			{name="empty", weight=1000},
 			{name="combat", weight=400},
-			{name="shop", weight=0},
+			-- {name="shop", weight=10},
 			{name="treasure", weight=50}
 		}
 	},
@@ -39,7 +39,7 @@ biomeList = {
 		states = {
 			{name="empty", weight=1000},
 			{name="combat", weight=0},
-			{name="shop", weight=0},
+			-- {name="shop", weight=10},
 			{name="treasure", weight=30}
 		}
 	},
@@ -53,7 +53,7 @@ biomeList = {
 		states = {
 			{name="empty", weight=1000},
 			{name="combat", weight=100},
-			{name="shop", weight=10},
+			-- {name="shop", weight=10},
 			{name="treasure", weight=10}
 		}
 	},
@@ -67,7 +67,7 @@ biomeList = {
 		states = {
 			{name="empty", weight=1000},
 			{name="combat", weight=150},
-			{name="shop", weight=20},
+			-- {name="shop", weight=10},
 			{name="treasure", weight=0}
 		}
 	},
@@ -81,7 +81,7 @@ biomeList = {
 		states = {
 			{name="empty", weight=1500},
 			{name="combat", weight=75},
-			{name="shop", weight=20},
+			-- {name="shop", weight=10},
 			{name="treasure", weight=20}
 		}
 	}
@@ -145,8 +145,8 @@ function Tile:clear()
 end
 
 function Tile:getNoiseBiome(x, y)
-    local scale = 0.025
-	local scale2 = 0.025
+    local scale = 0.02
+	local scale2 = 0.02
 
     self.n = love.math.noise(x * scale + Game.noiseSeed, y * scale + Game.noiseSeed)
 	self.n2 = love.math.noise(x * scale2 + 2 * Game.noiseSeed, y * scale2 + 2 * Game.noiseSeed)
