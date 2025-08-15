@@ -36,9 +36,9 @@ function inventory:draw()
         end
 
         love.graphics.rectangle("line", 10 + tempX, 10 + tempY, 100, 100)
-        love.graphics.print(player.statNames[key], 15 + tempX, 15 + tempY)
-        love.graphics.print(player.stats[key], 15 + tempX, 30 + tempY)
-        love.graphics.print(player.skillPoints[key], 15 + tempX, 45 + tempY)
+        love.graphics.print(player.stats[key][2], 15 + tempX, 15 + tempY)
+        love.graphics.print(player.stats[key][1], 15 + tempX, 30 + tempY)
+        love.graphics.print(player.stats[key][3], 15 + tempX, 45 + tempY)
         inventory.statIncrease[key] = Button.new(115 + tempX, 10 + tempY, 100, 50, "/\\")
         inventory.statDecrease[key] = Button.new(115 + tempX, 60 + tempY, 100, 50, "\\/")
     end
@@ -64,14 +64,14 @@ function inventory:mousepressed(x, y, button)
 	for key, value in pairs(player.stats) do
 		if Game.states.inventory.statIncrease[key]:mousepressed(x, y, button) then
 			if player.points > 0 then
-				player.skillPoints[key] = player.skillPoints[key] + 1
+				player.stats[key][4] = player.stats[key][4] + 1
 				player.points = player.points - 1
 			end
 		end
 
 		if Game.states.inventory.statDecrease[key]:mousepressed(x, y, button) then
-			if player.skillPoints[key] > 0 then
-				player.skillPoints[key] = player.skillPoints[key] - 1
+			if player.stats[key][4] > 0 then
+				player.stats[key][4] = player.stats[key][4] - 1
 				player.points = player.points + 1
 			end
 		end

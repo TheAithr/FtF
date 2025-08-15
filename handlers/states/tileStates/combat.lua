@@ -11,36 +11,17 @@ local combat = {
 	},
 
 	enemy = {
-		hp = 50,
 		stats = {
-		maxHealth = 50,
-		damage = 10,
-		critRate = 0,
-		critDamage = 2,
-		armor = 0,
-		lifesteal = 0
-		}
+		maxHealth = {50, "Max Health", 4, 50},
+		damage = {10, "Base Damage", 0.25, 10},
+		critRate = {0, "Crit Chance", 0.5, 0},
+		critDamage = {2, "Crit Damage", 0.025, 2},
+		armor = {0, "Armor", 0.25, 0},
+		lifesteal = {0, "Lifesteal", 0.1, 0}
+		},
+		hp = 50
 	}
 }
-
-local baseStats = {
-	maxHealth = 50,
-	damage = 10,
-	critRate = 0,
-	critDamage = 2,
-	armor = 0,
-	lifesteal = 0
-}
-
-local scaling = {
-	maxHealth = 4,
-	damage = 0.25,
-	critRate = 0.5,
-	critDamage = 0.025,
-	armor = 0.25,
-	lifesteal = 0.1
-}
-
 
 function combat:enter()
 	local player = Game.states.explore.player
@@ -48,23 +29,23 @@ function combat:enter()
 	Game.states.combat.enemy = Game.states.combat.enemy or {}
 	local enemy = Game.states.combat.enemy
 
-	for stat, base in pairs(baseStats) do
-        enemy.stats[stat] = base + (scaling[stat] * Game.states.explore.tilesCleared)
+	for stat, base in pairs(enemy.stats) do
+        enemy.stats[stat][1] = enemy.stats[stat][4] + (enemy.stats[stat][3] * Game.states.explore.tilesCleared)
     end
 
-	if enemy.stats.critRate >= 100 then
-		enemy.stats.critRate = 100
+	if enemy.stats.critRate[1] >= 100 then
+		enemy.stats.critRate[1] = 100
 	end
 	
-	enemy.stats.maxHealth = math.floor(enemy.stats.maxHealth)
+	enemy.stats.maxHealth[1] = math.floor(enemy.stats.maxHealth[1])
 	
-    enemy.hp = enemy.stats.maxHealth or 100
-	player.hp = player.stats.maxHealth or 100
+    enemy.hp = enemy.stats.maxHealth[1] or 100
+	player.hp = player.stats.maxHealth[1] or 100
 end
 
 function combat:leave()   
-	Game.states.combat.enemy.hp = Game.states.combat.enemy.stats.maxHealth or 100
-	Game.states.explore.player.hp = Game.states.explore.player.stats.maxHealth or 100
+	Game.states.combat.enemy.hp = Game.states.combat.enemy.stats.maxHealth[1] or 100
+	Game.states.explore.player.hp = Game.states.explore.player.stats.maxHealth[1] or 100
 end
 
 function combat:cleared()
@@ -88,8 +69,8 @@ end
 function combat:draw()
 	self:drawEnemyStats()
 	
-	self:drawHealthBar("Enemy HP", self.enemy.hp, self.enemy.stats.maxHealth, 30)
-    self:drawHealthBar("Player HP", Game.states.explore.player.hp, Game.states.explore.player.stats.maxHealth, windowHeight-150)
+	self:drawHealthBar("Enemy HP", self.enemy.hp, self.enemy.stats.maxHealth[1], 30)
+    self:drawHealthBar("Player HP", Game.states.explore.player.hp, Game.states.explore.player.stats.maxHealth[1], windowHeight-150)
    for _,b in pairs(combat.buttons) do b:draw() end
 end	
 
@@ -123,10 +104,10 @@ end
 
 function combat:drawEnemyStats()
 	love.graphics.print("Enemy Stats", 5, 85)
-	love.graphics.print("Damage: " .. Game.states.combat.enemy.stats.damage, 5, 100)
-	love.graphics.print("Crit Rate: " .. Game.states.combat.enemy.stats.critRate, 5, 115)
-	love.graphics.print("Armor: " .. Game.states.combat.enemy.stats.armor, 5, 130)
-	love.graphics.print("LifeSteal: " .. Game.states.combat.enemy.stats.lifesteal, 5, 145)
+	love.graphics.print("Damage: " .. Game.states.combat.enemy.stats.damage[1], 5, 100)
+	love.graphics.print("Crit Rate: " .. Game.states.combat.enemy.stats.critRate[1], 5, 115)
+	love.graphics.print("Armor: " .. Game.states.combat.enemy.stats.armor[1], 5, 130)
+	love.graphics.print("LifeSteal: " .. Game.states.combat.enemy.stats.lifesteal[1], 5, 145)
 	
 end
 
@@ -157,21 +138,21 @@ end
 
 function combat.damageCalc(user, target)
 	local critRoll = love.math.random(100)
-	if critRoll <= user.stats.critRate then
-		target.hp = target.hp - math.floor(user.stats.critDamage * (math.max(user.stats.damage / ((target.stats.armor / 50) + 1), 1)) * 10 + 0.5) / 10
-		if user.stats.lifesteal > 0 then
-			user.hp = math.min(user.hp + user.stats.critDamage * user.stats.lifesteal, user.stats.maxHealth)
+	if critRoll <= user.stats.critRate[1] then
+		target.hp = target.hp - math.floor(user.stats.critDamage[1] * (math.max(user.stats.damage[1] / ((target.stats.armor[1] / 50) + 1), 1)) * 10 + 0.5) / 10
+		if user.stats.lifesteal[1] > 0 then
+			user.hp = math.min(user.hp + user.stats.critDamage[1] * user.stats.lifesteal[1], user.stats.maxHealth[1])
 		end
 	else
-		target.hp = target.hp - math.floor(math.max(user.stats.damage / ((target.stats.armor / 50) + 1), 1)* 10 + 0.5) / 10
-		if user.stats.lifesteal > 0 then
-			user.hp = math.min(user.hp + user.stats.lifesteal, user.stats.maxHealth)
+		target.hp = target.hp - math.floor(math.max(user.stats.damage[1] / ((target.stats.armor[1] / 50) + 1), 1)* 10 + 0.5) / 10
+		if user.stats.lifesteal[1] > 0 then
+			user.hp = math.min(user.hp + user.stats.lifesteal[1], user.stats.maxHealth[1])
 		end
 	end
 end
 
 function combat.healCalc(user)
-	user.hp = math.floor(math.min(user.hp + user.stats.maxHealth / 10, user.stats.maxHealth)* 10 + 0.5) / 10
+	user.hp = math.floor(math.min(user.hp + user.stats.maxHealth[1] / 10, user.stats.maxHealth[1])* 10 + 0.5) / 10
 end
 
 function combat:checkPlayerDeath()

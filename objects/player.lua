@@ -14,50 +14,17 @@ function Player.new()
 	self.points = 1
 	
 	self.stats = {
-		movespeed = 200,
-		maxHealth = 100,
-		damage = 10,
-		critRate = 0,
-		critDamage = 2,
-		armor = 0,
-		lifesteal = 0, 
-		dodge = 0
+		movespeed = {200, "Movespeed", 20, 0},
+		maxHealth = {100, "Max Health", 10, 0},
+		damage = {10, "Base Damage", 1, 0},
+		critRate = {0, "Crit Chance", 1, 0},
+		critDamage = {2, "Crit Damage", 0.1, 0},
+		armor = {0, "Armor", 0.5, 0},
+		lifesteal = {0, "Lifesteal", 0.5, 0}, 
+		dodge = {0, "Dodge Chance", 0.25, 0}
 	}
 
 	self.hp = self.stats.maxHealth or 100
-
-	self.statNames = {
-		movespeed = "Movespeed",
-		maxHealth = "Max Health",
-		damage = "Base Damage",
-		critRate = "Crit Chance",
-		critDamage = "Crit Damage",
-		armor = "Defence",
-		lifesteal = "Lifesteal",
-		dodge = "Dodge Chance"
-	}
-
-	self.perLevel = {
-		movespeed = 20,
-		maxHealth = 10,
-		damage = 1,
-		critRate = 1,
-		critDamage = 0.1,
-		armor = 0.5,
-		lifesteal = 0.5,
-		dodge = 0.25
-	}
-
-	self.skillPoints = {
-		movespeed = 0,
-		maxHealth = 0,
-		damage = 0,
-		critRate = 0,
-		critDamage = 0,
-		armor = 0,
-		lifesteal = 0,
-		dodge = 0
-	}
 
 	return self
 end
@@ -71,7 +38,7 @@ function Player:update(dt)
 				speedMult = b.speedMult
 			end
 		end
-		speed = self.stats.movespeed * speedMult
+		speed = self.stats.movespeed[1] * speedMult
 		
 		if love.keyboard.isDown("a") then
 			self.x = self.x - speed * dt
@@ -100,14 +67,14 @@ function Player:draw()
 end
 
 function Player:updateStats()
-	self.stats.movespeed = 200
-	self.stats.maxHealth = 100
-	self.stats.damage = 10
-	self.stats.critRate = 0
-	self.stats.critDamage = 2
-	self.stats.armor = 0
-	self.stats.lifesteal = 0
-	self.stats.dodge = 0
+	self.stats.movespeed[1] = 200
+	self.stats.maxHealth[1] = 100
+	self.stats.damage[1] = 10
+	self.stats.critRate[1] = 0
+	self.stats.critDamage[1] = 2
+	self.stats.armor[1] = 0
+	self.stats.lifesteal[1] = 0
+	self.stats.dodge[1] = 0
 
 	while self.xp >= 100 do
 		self.xp = self.xp - 100
@@ -120,7 +87,7 @@ function Player:updateStats()
 	end
 
 	for stat, base in pairs(self.stats) do
-        self.stats[stat] = base + (self.perLevel[stat] * self.skillPoints[stat])
+        self.stats[stat][1] = self.stats[stat][1] + (self.stats[stat][3] * self.stats[stat][4])
     end
 end
 

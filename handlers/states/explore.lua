@@ -33,6 +33,7 @@ function explore:update(dt)
 	Game.states.explore.player:update(dt)
 
 	local bounds = Game.states.explore.visibleTileBounds
+
 	for i = bounds.minX, bounds.maxX do
 		for j = bounds.minY, bounds.maxY do
 			local tile = Game:getTile(i, j)
