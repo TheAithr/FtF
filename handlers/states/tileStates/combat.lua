@@ -75,13 +75,19 @@ function combat:draw()
 end	
 
 function combat:mousepressed(x, y, button)
-    for i,act in ipairs({"attack","ability","heal","run"}) do
-        if buttons[act]:mousepressed(x,y,button) then self:turnHandler(i) end
-    end
+	local buttons = Game.states.combat.buttons
+	if buttons.attack:mousepressed(x, y, button) then self:turnHandler(1) end
+	if buttons.ability:mousepressed(x, y, button) then self:turnHandler(2) end
+	if buttons.heal:mousepressed(x, y, button) then self:turnHandler(3) end
+	if buttons.run:mousepressed(x, y, button) then self:turnHandler(4) end
 end
 
 function combat:mousereleased(x, y, button)
-    for _,b in pairs(btns) do b:mousereleased(x,y,button) end
+    local buttons = Game.states.combat.buttons
+	if buttons.attack:mousereleased(x, y, button) then self:turnHandler(1) end
+	if buttons.ability:mousereleased(x, y, button) then self:turnHandler(2) end
+	if buttons.heal:mousereleased(x, y, button) then self:turnHandler(3) end
+	if buttons.run:mousereleased(x, y, button) then self:turnHandler(4) end
 end
 
 function combat:keypressed(_, sc)
