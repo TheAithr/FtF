@@ -22,14 +22,25 @@ function inventory:draw()
 
     local statOrder = player.statOrder or {"movespeed", "maxHealth", "damage", "critRate", "critDamage", "armor", "lifesteal", "dodge"}
     local i = -1
+    local tempX = 0
+    local tempY = 0
     for _, key in ipairs(statOrder) do
         i = i + 1
-        love.graphics.rectangle("line", 10, 10 + i * 100, 100, 100)
-        love.graphics.print(player.statNames[key], 15, 15 + i * 100)
-        love.graphics.print(player.stats[key], 15, 30 + i * 100)
-        love.graphics.print(player.skillPoints[key], 15, 45 + i * 100)
-        inventory.statIncrease[key] = Button.new(115, 10 + i * 100, 100, 50, "/\\")
-        inventory.statDecrease[key] = Button.new(115, 60 + i * 100, 100, 50, "\\/")
+        if i > 0 then
+            tempY = tempY + 100
+        end
+        
+        if i % 8 == 0 and i > 0 then
+            tempX = tempX + 210
+            tempY = 0
+        end
+
+        love.graphics.rectangle("line", 10 + tempX, 10 + tempY, 100, 100)
+        love.graphics.print(player.statNames[key], 15 + tempX, 15 + tempY)
+        love.graphics.print(player.stats[key], 15 + tempX, 30 + tempY)
+        love.graphics.print(player.skillPoints[key], 15 + tempX, 45 + tempY)
+        inventory.statIncrease[key] = Button.new(115 + tempX, 10 + tempY, 100, 50, "/\\")
+        inventory.statDecrease[key] = Button.new(115 + tempX, 60 + tempY, 100, 50, "\\/")
     end
 
     for _, button in pairs(inventory.statIncrease) do
@@ -39,6 +50,8 @@ function inventory:draw()
     for _, button in pairs(inventory.statDecrease) do
         button:draw()
     end
+
+    love.graphics.print("Skillpoints: " .. player.points, windowWidth - 100, 50)
 
     Game.states.inventory.exit:draw()
 end

@@ -62,6 +62,8 @@ function explore:draw()
 	love.graphics.print("X: " .. tileX, 10, 25)
 	love.graphics.print("Y: " .. -tileY, 10, 40)
 	love.graphics.print("tiles cleared: " .. Game.states.explore.tilesCleared, 10, 55)
+	love.graphics.print("XP: " .. Game.states.explore.player.xp .. "/100", 10, 70)
+	love.graphics.print("Skillpoints: " .. Game.states.explore.player.points, 10, 85)
 end
 
 function explore:keypressed(key, scancode)

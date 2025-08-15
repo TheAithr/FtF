@@ -1,4 +1,4 @@
-tileSize = 25
+tileSize = 75
 love.window.setMode(1200, 900)
 
 local StateManager = require("handlers.stateManager")

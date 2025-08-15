@@ -38,14 +38,14 @@ function Player.new()
 	}
 
 	self.perLevel = {
-		movespeed = 5,
+		movespeed = 20,
 		maxHealth = 10,
-		damage = 0.5,
+		damage = 1,
 		critRate = 1,
-		critDamage = 0,
-		armor = 0.1,
+		critDamage = 0.1,
+		armor = 0.5,
 		lifesteal = 0.5,
-		dodge = 0.1
+		dodge = 0.25
 	}
 
 	self.skillPoints = {

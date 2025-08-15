@@ -3,10 +3,12 @@ require("game")
 local windowWidth, windowHeight = love.graphics.getDimensions()
 
 local combat = {
-	attack = Button.new(5, windowHeight - 105, windowWidth/3 - 10, 100, "Attack"),
-	ability = Button.new(5 + windowWidth/3, windowHeight - 105, windowWidth/3 - 10, 100, "Ability"),
-	heal = Button.new(5 + 2 * (windowWidth/3), windowHeight - 105, windowWidth/3 - 10, 100, "Heal"),
-	run = Button.new(windowWidth - 105, windowHeight - 140, 100, 25, "Run Away"),
+	buttons = {
+		attack = Button.new(5, windowHeight - 105, windowWidth/3 - 10, 100, "Attack"),
+		ability = Button.new(5 + windowWidth/3, windowHeight - 105, windowWidth/3 - 10, 100, "Ability"),
+		heal = Button.new(5 + 2 * (windowWidth/3), windowHeight - 105, windowWidth/3 - 10, 100, "Heal"),
+		run = Button.new(windowWidth - 105, windowHeight - 140, 100, 25, "Run Away")
+	},
 
 	enemy = {
 		hp = 50,
@@ -31,12 +33,12 @@ local baseStats = {
 }
 
 local scaling = {
-	maxHealth = 8,
-	damage = 0.5,
-	critRate = 1,
-	critDamage = 0.05,
-	armor = 0.5,
-	lifesteal = 0.2
+	maxHealth = 4,
+	damage = 0.25,
+	critRate = 0.5,
+	critDamage = 0.025,
+	armor = 0.25,
+	lifesteal = 0.1
 }
 
 
@@ -69,7 +71,7 @@ function combat:cleared()
 	tile:clear()
 	local random = require("lib.random")
 	Game.states.explore.gold = Game.states.explore.gold + random.tileRoll()
-	Game.states.explore.player.xp = Game.states.explore.player.xp + 5 * Game.states.explore.tilesCleared
+	Game.states.explore.player.xp = Game.states.explore.player.xp + 10 * Game.states.explore.tilesCleared
 	Game.states.explore.player:updateStats()
 end
 
@@ -79,79 +81,44 @@ function combat:update(dt)
         local tileY = math.floor(Game.states.explore.player.y / Game.states.explore.tileSize)
         local tile = Game:getTile(tileX, tileY)
 
-        if tile 
-		and not tile.cleared then
-            self:cleared()
-        end
+        if tile and not tile.cleared then self:cleared() end
     end
 end
 
 function combat:draw()
-	self:drawEnemyHealth()
 	self:drawEnemyStats()
-	self:drawPlayerHealth()
 	
-	Game.states.combat.attack:draw()
-    Game.states.combat.ability:draw()
-    Game.states.combat.heal:draw()
-    Game.states.combat.run:draw()
+	self:drawHealthBar("Enemy HP", self.enemy.hp, self.enemy.stats.maxHealth, 30)
+    self:drawHealthBar("Player HP", Game.states.explore.player.hp, Game.states.explore.player.stats.maxHealth, windowHeight-150)
+   for _,b in pairs(combat.buttons) do b:draw() end
 end	
 
 function combat:mousepressed(x, y, button)
-    if Game.states.combat.attack:mousepressed(x, y, button) then
-        self:turnHandler(1)
-    end
-    if Game.states.combat.ability:mousepressed(x, y, button) then
-        self:turnHandler(2)
-    end
-    if Game.states.combat.heal:mousepressed(x, y, button) then
-        self:turnHandler(3)
-    end
-    if Game.states.combat.run:mousepressed(x, y, button) then
-        self:turnHandler(4)
+    for i,act in ipairs({"attack","ability","heal","run"}) do
+        if buttons[act]:mousepressed(x,y,button) then self:turnHandler(i) end
     end
 end
 
 function combat:mousereleased(x, y, button)
-    Game.states.combat.attack:mousereleased(x, y, button)
-    Game.states.combat.ability:mousereleased(x, y, button)
-    Game.states.combat.heal:mousereleased(x, y, button)
-    Game.states.combat.run:mousereleased(x, y, button)
+    for _,b in pairs(btns) do b:mousereleased(x,y,button) end
 end
 
-function combat:keypressed(key, scancode)
-	if scancode == "1" then
-		self:turnHandler(1)
-	end
-	if scancode == "2" then
-		self:turnHandler(2)
-	end
-	if scancode == "3" then
-		self:turnHandler(3)
-	end
-	if scancode == "4" then
-		self:turnHandler(4)
-	end
+function combat:keypressed(_, sc)
+	for i=1,4 do if sc==tostring(i) then self:turnHandler(i) end end
 end
 
-function combat:drawEnemyHealth()
-	local barWidth = 300
-	local barHeight = 20
-	local x = (windowWidth - barWidth) / 2
-	local y = 30
-	local healthPercent = math.max(Game.states.combat.enemy.hp / Game.states.combat.enemy.stats.maxHealth, 0)
+function combat:drawHealthBar(label, hp, maxHp, y)
+	local w, h = 300, 20 
+	local x = (windowWidth - w) / 2
+	local percent = math.max(hp/maxHp, 0)
 
-	love.graphics.setColor(0.2, 0.2, 0.2, 1)
-	love.graphics.rectangle("fill", x, y, barWidth, barHeight)
-
-	love.graphics.setColor(1, 0.2, 0.2, 1)
-	love.graphics.rectangle("fill", x, y, barWidth * healthPercent, barHeight)
-	
-	love.graphics.setColor(1, 1, 1, 1)
-	love.graphics.rectangle("line", x, y, barWidth, barHeight)
-
-	love.graphics.setColor(1, 1, 1, 1)
-	love.graphics.printf("Enemy HP: " .. Game.states.combat.enemy.hp .. "/" .. Game.states.combat.enemy.stats.maxHealth, x, y + barHeight + 5, barWidth, "center")
+	love.graphics.setColor(0.2,0.2,0.2,1)
+    love.graphics.rectangle("fill",x,y,w,h)
+    love.graphics.setColor(1,0.2,0.2,1)
+    love.graphics.rectangle("fill",x,y,w*percent,h)
+    love.graphics.setColor(1,1,1,1)
+    love.graphics.rectangle("line",x,y,w,h)
+    love.graphics.printf(label..": "..hp.."/"..maxHp,x,y+h+5,w,"center")
 end
 
 function combat:drawEnemyStats()
@@ -161,28 +128,6 @@ function combat:drawEnemyStats()
 	love.graphics.print("Armor: " .. Game.states.combat.enemy.stats.armor, 5, 130)
 	love.graphics.print("LifeSteal: " .. Game.states.combat.enemy.stats.lifesteal, 5, 145)
 	
-end
-
-function combat:drawPlayerHealth()
-	local player = Game.states.explore.player
-
-	local barWidth = 300
-	local barHeight = 20
-	local x = (windowWidth - barWidth) / 2
-	local y = windowHeight - 150
-	local healthPercent = math.max(player.hp / player.stats.maxHealth, 0)
-	
-	love.graphics.setColor(0.2, 0.2, 0.2, 1)
-	love.graphics.rectangle("fill", x, y, barWidth, barHeight)
-	
-	love.graphics.setColor(1, 0.2, 0.2, 1)
-	love.graphics.rectangle("fill", x, y, barWidth * healthPercent, barHeight)
-
-	love.graphics.setColor(1, 1, 1, 1)
-	love.graphics.rectangle("line", x, y, barWidth, barHeight)
-
-	love.graphics.setColor(1, 1, 1, 1)
-	love.graphics.printf("Player HP: " .. player.hp .. "/" .. player.stats.maxHealth, x, y + barHeight + 5, barWidth, "center")
 end
 
 function combat:turnHandler(action)
@@ -213,12 +158,12 @@ end
 function combat.damageCalc(user, target)
 	local critRoll = love.math.random(100)
 	if critRoll <= user.stats.critRate then
-		target.hp = target.hp - user.stats.critDamage * (math.max(user.stats.damage - target.stats.armor, 1))
+		target.hp = target.hp - math.floor(user.stats.critDamage * (math.max(user.stats.damage / ((target.stats.armor / 50) + 1), 1)) * 10 + 0.5) / 10
 		if user.stats.lifesteal > 0 then
 			user.hp = math.min(user.hp + user.stats.critDamage * user.stats.lifesteal, user.stats.maxHealth)
 		end
 	else
-		target.hp = target.hp - math.max(user.stats.damage - target.stats.armor, 1)
+		target.hp = target.hp - math.floor(math.max(user.stats.damage / ((target.stats.armor / 50) + 1), 1)* 10 + 0.5) / 10
 		if user.stats.lifesteal > 0 then
 			user.hp = math.min(user.hp + user.stats.lifesteal, user.stats.maxHealth)
 		end
@@ -226,7 +171,7 @@ function combat.damageCalc(user, target)
 end
 
 function combat.healCalc(user)
-	user.hp = math.min(user.hp + user.stats.maxHealth / 10, user.stats.maxHealth)
+	user.hp = math.floor(math.min(user.hp + user.stats.maxHealth / 10, user.stats.maxHealth)* 10 + 0.5) / 10
 end
 
 function combat:checkPlayerDeath()
