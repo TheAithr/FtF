@@ -35,7 +35,8 @@ function treasure:keypressed(key, scancode)
 end
 
 function treasure:openChest()
-	-- Item:generateItem(Game.states.explore.player.inventory)
+	Game.states.explore.player.xp = Game.states.explore.player.xp + (20 * Game.states.explore.tilesCleared)
+	Game.states.explore.player:updateStats()
 	tile:clear()
 end
 	

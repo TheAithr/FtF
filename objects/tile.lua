@@ -12,7 +12,7 @@ biomeList = {
 			{name="empty", weight=1000},
 			{name="combat", weight=200},
 			-- {name="shop", weight=10},
-			{name="treasure", weight=25}
+			{name="treasure", weight=10}
 		}
 	},
 
@@ -26,7 +26,7 @@ biomeList = {
 			{name="empty", weight=1000},
 			{name="combat", weight=400},
 			-- {name="shop", weight=10},
-			{name="treasure", weight=50}
+			{name="treasure", weight=25}
 		}
 	},
 
@@ -40,7 +40,7 @@ biomeList = {
 			{name="empty", weight=1000},
 			{name="combat", weight=0},
 			-- {name="shop", weight=10},
-			{name="treasure", weight=30}
+			{name="treasure", weight=15}
 		}
 	},
 
@@ -54,7 +54,7 @@ biomeList = {
 			{name="empty", weight=1000},
 			{name="combat", weight=100},
 			-- {name="shop", weight=10},
-			{name="treasure", weight=10}
+			{name="treasure", weight=5}
 		}
 	},
 
@@ -82,7 +82,7 @@ biomeList = {
 			{name="empty", weight=1500},
 			{name="combat", weight=75},
 			-- {name="shop", weight=10},
-			{name="treasure", weight=20}
+			{name="treasure", weight=10}
 		}
 	}
 }
