@@ -30,7 +30,6 @@ function Player.new()
 end
 
 function Player:update(dt)
-	print("current state: ", Game.stateManager.currentID)
 	if Game.stateManager.currentID == "explore" then
 		local speed
 		for _,b in pairs(biomeList) do
@@ -76,10 +75,12 @@ function Player:updateStats()
 	self.stats.lifesteal[1] = 0
 	self.stats.dodge[1] = 0
 
-	while self.xp >= 100 do
-		self.xp = self.xp - 100
+	local levelCost = 90 + (10 * self.level)
+
+	while self.xp >= levelCost do
+		self.xp = self.xp - levelCost
 		self.level = self.level + 1
-		if self.level % 5 == 0 then
+		if self.level % 10 == 0 then
 			self.points = self.points + 3
 		else
 			self.points = self.points + 1

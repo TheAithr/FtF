@@ -17,7 +17,8 @@ local combat = {
 		critRate = {0, "Crit Chance", 0.5, 0},
 		critDamage = {2, "Crit Damage", 0.025, 2},
 		armor = {0, "Armor", 0.25, 0},
-		lifesteal = {0, "Lifesteal", 0.1, 0}
+		lifesteal = {0, "Lifesteal", 0.1, 0},
+		dodge = {0, "Dodge Chance", 0.25, 0}
 		},
 		hp = 50
 	}
@@ -144,15 +145,19 @@ end
 
 function combat.damageCalc(user, target)
 	local critRoll = love.math.random(100)
-	if critRoll <= user.stats.critRate[1] then
-		target.hp = target.hp - math.floor(user.stats.critDamage[1] * (math.max(user.stats.damage[1] / ((target.stats.armor[1] / 50) + 1), 1)) * 10 + 0.5) / 10
-		if user.stats.lifesteal[1] > 0 then
-			user.hp = math.min(user.hp + user.stats.critDamage[1] * user.stats.lifesteal[1], user.stats.maxHealth[1])
-		end
-	else
-		target.hp = target.hp - math.floor(math.max(user.stats.damage[1] / ((target.stats.armor[1] / 50) + 1), 1)* 10 + 0.5) / 10
-		if user.stats.lifesteal[1] > 0 then
-			user.hp = math.min(user.hp + user.stats.lifesteal[1], user.stats.maxHealth[1])
+	local dodgeRoll = love.math.random(100)
+
+	if dodgeRoll > target.stats.dodge[1] then
+		if critRoll <= user.stats.critRate[1] then
+			target.hp = target.hp - math.floor(user.stats.critDamage[1] * (math.max(user.stats.damage[1] / ((target.stats.armor[1] / 50) + 1), 1)) * 10 + 0.5) / 10
+			if user.stats.lifesteal[1] > 0 then
+				user.hp = math.min(user.hp + user.stats.critDamage[1] * user.stats.lifesteal[1], user.stats.maxHealth[1])
+			end
+		else
+			target.hp = target.hp - math.floor(math.max(user.stats.damage[1] / ((target.stats.armor[1] / 50) + 1), 1)* 10 + 0.5) / 10
+			if user.stats.lifesteal[1] > 0 then
+				user.hp = math.min(user.hp + user.stats.lifesteal[1], user.stats.maxHealth[1])
+			end
 		end
 	end
 end
