@@ -1,4 +1,4 @@
-tileSize = 75
+tileSize = 25
 love.window.setMode(1200, 900)
 
 local StateManager = require("handlers.stateManager")
@@ -6,9 +6,10 @@ local StateManager = require("handlers.stateManager")
 local stateModules = {
 	explore   = "handlers.states.explore",
 
-    combat    = "handlers.states.tileStates.combat",
+	combat    = "handlers.states.tileStates.combat",
     shop      = "handlers.states.tileStates.shop",
     treasure  = "handlers.states.tileStates.treasure",
+	fishing  = "handlers.states.tileStates.fishing",
 
 	inventory = "handlers.states.menuStates.inventory",
     death     = "handlers.states.menuStates.death",
@@ -33,7 +34,7 @@ function love.load()
 	tileY = 0
 	tile = Game:getTile(tileX, tileY)
 
-	Game.stateManager:switch("explore")
+	Game.stateManager:switch("fishing")
 end
 
 function love.update(dt)

@@ -25,6 +25,7 @@ function Player.new()
 	}
 
 	self.hp = self.stats.maxHealth or 100
+	self.fish = 0
 
 	return self
 end

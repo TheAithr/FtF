@@ -9,10 +9,11 @@ biomeList = {
 		threshold = 0.2,
 		threshold2 = 0.3,
 		states = {
-			{name="empty", weight=1000},
+			-- {name="empty", weight=1000},
 			{name="combat", weight=200},
 			-- {name="shop", weight=10},
-			{name="treasure", weight=10}
+			{name="treasure", weight=10},
+			{name="fishing", weight=1000}
 		}
 	},
 
@@ -23,10 +24,11 @@ biomeList = {
 		threshold = 0.2,
 		threshold2 = 1,
 		states = {
-			{name="empty", weight=1000},
+			-- {name="empty", weight=1000},
 			{name="combat", weight=400},
 			-- {name="shop", weight=10},
-			{name="treasure", weight=25}
+			{name="treasure", weight=25},
+			{name="fishing", weight=1000}
 		}
 	},
 
@@ -40,7 +42,8 @@ biomeList = {
 			{name="empty", weight=1000},
 			{name="combat", weight=0},
 			-- {name="shop", weight=10},
-			{name="treasure", weight=15}
+			{name="treasure", weight=15},
+			{name="fishing", weight=0}
 		}
 	},
 
@@ -54,7 +57,8 @@ biomeList = {
 			{name="empty", weight=1000},
 			{name="combat", weight=100},
 			-- {name="shop", weight=10},
-			{name="treasure", weight=5}
+			{name="treasure", weight=5},
+			{name="fishing", weight=0}
 		}
 	},
 
@@ -68,7 +72,8 @@ biomeList = {
 			{name="empty", weight=1000},
 			{name="combat", weight=150},
 			-- {name="shop", weight=10},
-			{name="treasure", weight=0}
+			{name="treasure", weight=0},
+			{name="fishing", weight=0}
 		}
 	},
 
@@ -82,7 +87,8 @@ biomeList = {
 			{name="empty", weight=1500},
 			{name="combat", weight=75},
 			-- {name="shop", weight=10},
-			{name="treasure", weight=10}
+			{name="treasure", weight=10},
+			{name="fishing", weight=0}
 		}
 	}
 }
@@ -120,7 +126,7 @@ function Tile:draw()
 	love.graphics.rectangle("fill", self.x, self.y, self.width - 0.5, self.height - 0.5)
 
 	love.graphics.setColor(0, 0, 0, 1)
-	if self.state ~= "empty" then
+	if self.state ~= "empty" and self.state ~= "fishing" then
 		love.graphics.print(self.state, self.x + 5, self.y + 5)
 	end
 	love.graphics.setColor(1, 1, 1, 1)
@@ -145,8 +151,8 @@ function Tile:clear()
 end
 
 function Tile:getNoiseBiome(x, y)
-    local scale = 0.02
-	local scale2 = 0.02
+    local scale = 0.0008
+	local scale2 = 0.00035
 
     self.n = love.math.noise(x * scale + Game.noiseSeed, y * scale + Game.noiseSeed)
 	self.n2 = love.math.noise(x * scale2 + 2 * Game.noiseSeed, y * scale2 + 2 * Game.noiseSeed)
@@ -176,7 +182,7 @@ return biomes[#biomes].name
 end
 
 function Tile:rollBiome()
-	return self:getNoiseBiome(self.xCoor, self.yCoor)
+	return self:getNoiseBiome(self.x, self.y)
 end
 
 return Tile

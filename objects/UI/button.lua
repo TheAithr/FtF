@@ -93,4 +93,8 @@ function Button:draw()
 	love.graphics.setColor(1, 1, 1, 1)
 end
 
+function Button:changeText(text)
+	self.text = text
+end
+
 return Button

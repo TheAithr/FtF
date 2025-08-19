@@ -64,6 +64,8 @@ function combat:update(dt)
         local tile = Game:getTile(tileX, tileY)
 
         if tile and not tile.cleared then self:cleared() end
+
+		buttons.heal:changeText("Fish: " .. Game.states.explore.player.fish)
     end
 end
 
@@ -91,8 +93,12 @@ function combat:mousereleased(x, y, button)
 	if buttons.run:mousereleased(x, y, button) then self:turnHandler(4) end
 end
 
-function combat:keypressed(_, sc)
-	for i=1,4 do if sc==tostring(i) then self:turnHandler(i) end end
+function combat:keypressed(_, scancode)
+	for i=1,4 do 
+		if scancode==tostring(i) then 
+			self:turnHandler(i) 
+		end 
+	end
 end
 
 function combat:drawHealthBar(label, hp, maxHp, y)
@@ -126,20 +132,17 @@ function combat:turnHandler(action)
 	elseif action == 2 then
 		print("Ability Stuff")
 	elseif action == 3 then
-		self.healCalc(Game.states.explore.player)
+		if Game.states.explore.player.fish > 0 then
+			self.healCalc(Game.states.explore.player)
+		end
 	else
 		Game.stateManager:switch("explore")
 		escaped = true
 	end
 	
 	if not escaped then
-		roll = love.math.random(1, 2)
-		if roll == 1 then
-			self.damageCalc(Game.states.combat.enemy, Game.states.explore.player)
-			self:checkPlayerDeath()
-		elseif roll == 2 then
-			self.healCalc(Game.states.combat.enemy)
-		end
+		self.damageCalc(Game.states.combat.enemy, Game.states.explore.player)
+		self:checkPlayerDeath()
 	end
 end
 
@@ -163,7 +166,10 @@ function combat.damageCalc(user, target)
 end
 
 function combat.healCalc(user)
-	user.hp = math.floor(math.min(user.hp + user.stats.maxHealth[1] / 10, user.stats.maxHealth[1])* 10 + 0.5) / 10
+	if user.hp < user.stats.maxHealth[1] then
+		user.hp = math.floor(math.min(user.hp + user.stats.maxHealth[1] / 2, user.stats.maxHealth[1])* 10 + 0.5) / 10
+		user.fish = user.fish - 1
+	end
 end
 
 function combat:checkPlayerDeath()

@@ -52,6 +52,7 @@ function inventory:draw()
     end
 
     love.graphics.print("Skillpoints: " .. player.points, windowWidth - 100, 50)
+    love.graphics.print("Fish: " .. player.fish, windowWidth - 100, 65)
 
     Game.states.inventory.exit:draw()
 end
