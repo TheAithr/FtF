@@ -10,7 +10,6 @@ biomeList = {
 		threshold2 = 0.3,
 		states = {
 			-- {name="empty", weight=1000},
-			-- {name="combat", weight=200},
 			-- {name="shop", weight=10},
 			{name="treasure", weight=10},
 			{name="fishing", weight=1000}
@@ -25,7 +24,6 @@ biomeList = {
 		threshold2 = 1,
 		states = {
 			-- {name="empty", weight=1000},
-			-- {name="combat", weight=400},
 			-- {name="shop", weight=10},
 			{name="treasure", weight=25},
 			{name="fishing", weight=1000}
@@ -40,7 +38,6 @@ biomeList = {
 		threshold2 = 1,
 		states = {
 			{name="empty", weight=1000},
-			-- {name="combat", weight=0},
 			-- {name="shop", weight=10},
 			{name="treasure", weight=15},
 			{name="fishing", weight=0}
@@ -55,7 +52,6 @@ biomeList = {
 		threshold2 = 0.5,
 		states = {
 			{name="empty", weight=1000},
-			-- {name="combat", weight=100},
 			-- {name="shop", weight=10},
 			{name="treasure", weight=5},
 			{name="fishing", weight=0}
@@ -70,7 +66,6 @@ biomeList = {
 		threshold2 = 1,
 		states = {
 			{name="empty", weight=1000},
-			-- {name="combat", weight=150},
 			-- {name="shop", weight=10},
 			{name="treasure", weight=0},
 			{name="fishing", weight=0}
@@ -85,7 +80,6 @@ biomeList = {
 		threshold2 = 1,
 		states = {
 			{name="empty", weight=1500},
-			-- {name="combat", weight=75},
 			-- {name="shop", weight=10},
 			{name="treasure", weight=10},
 			{name="fishing", weight=0}
