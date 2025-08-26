@@ -4,8 +4,8 @@ Player.__index = Player
 function Player.new()
 	local self = setmetatable({}, Player)
 	
-	self.x = love.math.random(-100, 100) * tileSize
-	self.y = love.math.random(-100, 100) * tileSize
+	self.x = 0
+	self.y = 0
 	self.width = 50
 	self.height = 50
 
@@ -24,13 +24,22 @@ function Player.new()
 		dodge = {0, "Dodge Chance", 0.25, 0}
 	}
 
-	self.hp = self.stats.maxHealth or 100
+	self.immunity = 0
+
+	self.projectiles = {}
+	self.team = "player"
+
+	self.hp = self.stats.maxHealth[1] or 100
 	self.fish = 0
 
 	return self
 end
 
 function Player:update(dt)
+	local tileX = math.floor(self.x / tileSize)
+	local tileY = math.floor(self.y / tileSize)
+	local tile = Game:getTile(tileX, tileY)
+
 	if Game.stateManager.currentID == "explore" then
 		local speed
 		for _,b in pairs(biomeList) do
@@ -39,29 +48,39 @@ function Player:update(dt)
 			end
 		end
 		speed = self.stats.movespeed[1] * speedMult
+
+		for i,v in ipairs(self.projectiles) do
+			local pState = v:update(dt)
+			if pState == "dead" then
+				table.remove(self.projectiles, i)
+			end
+		end
+
+		self:checkCollidingProjectile()
+		self.immunity = self.immunity - dt
 		
 		if love.keyboard.isDown("a") then
 			self.x = self.x - speed * dt
-			print("moveLeft")
 		end
 		if love.keyboard.isDown("d") then
 			self.x = self.x + speed * dt
-			print("moveRight")
 		end
 		if love.keyboard.isDown("w") then
 			self.y = self.y - speed * dt
-			print("moveUp")
 		end
 		if love.keyboard.isDown("s") then
 			self.y = self.y + speed * dt
-			print("moveDown")
 		end
+		self:updateStats()
 	end
 end
 
 function Player:draw()
+	for i,v in ipairs(self.projectiles) do
+		v:draw()
+	end
 	love.graphics.rectangle("fill", self.x - self.width/2, self.y - self.height/2, self.width, self.height)
-	love.graphics.setColor(0, 0, 0, 1)
+	love.graphics.setColor(0, 0, 1, 1)
 	love.graphics.rectangle("fill", self.x + 2 - self.width/2, self.y + 2 - self.height/2, self.width - 4, self.height - 4)
 	love.graphics.setColor(1, 1, 1, 1)
 end
@@ -91,6 +110,30 @@ function Player:updateStats()
 	for stat, base in pairs(self.stats) do
         self.stats[stat][1] = self.stats[stat][1] + (self.stats[stat][3] * self.stats[stat][4])
     end
+end
+
+function Player:checkCollidingProjectile()
+	if self.immunity <= 0 then
+		local hit = false
+		for i,enemy in ipairs(Game.states.explore.enemies) do
+			for j,projectile in ipairs(enemy.projectiles) do
+				if projectile:collision(self.x, self.y, self.width, self.height) then
+					self.hp = self.hp - enemy.stats.damage[1]
+					table.remove(enemy.projectiles, j)
+					self.immunity = 1
+					return
+				end
+			end
+		end
+	end
+end
+
+function Player:shoot(targetX, targetY)
+	table.insert(self.projectiles, Projectile.new(self.x, self.y, 750, 5, targetX, targetY, self.team))
+end
+
+function Player:checkDeath()
+	return self.hp <= 0
 end
 
 return Player

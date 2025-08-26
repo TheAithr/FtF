@@ -4,9 +4,9 @@ local windowWidth, windowHeight = love.graphics.getDimensions()
 
 local combat = {
 	buttons = {
-		attack = Button.new(5, windowHeight - 105, windowWidth/3 - 10, 100, "Attack"),
-		ability = Button.new(5 + windowWidth/3, windowHeight - 105, windowWidth/3 - 10, 100, "Ability"),
-		heal = Button.new(5 + 2 * (windowWidth/3), windowHeight - 105, windowWidth/3 - 10, 100, "Heal"),
+		attacks = Button.new(5, windowHeight - 105, windowWidth/2 - 10, 100, "Attacks"),
+		quickAttack = Button.new(5, windowHeight - 140, 100, 25, "Quick Attack"),
+		items = Button.new(5 + windowWidth/2, windowHeight - 105, windowWidth/2 - 10, 100, "Items"),
 		run = Button.new(windowWidth - 105, windowHeight - 140, 100, 25, "Run Away")
 	},
 
@@ -80,16 +80,16 @@ end
 function combat:mousepressed(x, y, button)
 	local buttons = Game.states.combat.buttons
 	if buttons.attack:mousepressed(x, y, button) then self:turnHandler(1) end
-	if buttons.ability:mousepressed(x, y, button) then self:turnHandler(2) end
-	if buttons.heal:mousepressed(x, y, button) then self:turnHandler(3) end
+	if buttons.quickAttack:mousepressed(x, y, button) then self:turnHandler(2) end
+	if buttons.items:mousepressed(x, y, button) then self:turnHandler(3) end
 	if buttons.run:mousepressed(x, y, button) then self:turnHandler(4) end
 end
 
 function combat:mousereleased(x, y, button)
     local buttons = Game.states.combat.buttons
 	if buttons.attack:mousereleased(x, y, button) then self:turnHandler(1) end
-	if buttons.ability:mousereleased(x, y, button) then self:turnHandler(2) end
-	if buttons.heal:mousereleased(x, y, button) then self:turnHandler(3) end
+	if buttons.quickAttack:mousereleased(x, y, button) then self:turnHandler(2) end
+	if buttons.items:mousereleased(x, y, button) then self:turnHandler(3) end
 	if buttons.run:mousereleased(x, y, button) then self:turnHandler(4) end
 end
 
@@ -130,11 +130,10 @@ function combat:turnHandler(action)
 		self.damageCalc(Game.states.explore.player, Game.states.combat.enemy)
 		self:checkEnemyDeath()
 	elseif action == 2 then
-		print("Ability Stuff")
+		self.damageCalc(Game.states.explore.player, Game.states.combat.enemy)
+		self:checkEnemyDeath()
 	elseif action == 3 then
-		if Game.states.explore.player.fish > 0 then
-			self.healCalc(Game.states.explore.player)
-		end
+		-- Items menu
 	else
 		Game.stateManager:switch("explore")
 		escaped = true

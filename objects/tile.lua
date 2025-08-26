@@ -5,12 +5,12 @@ biomeList = {
 	shallowOceanBiome = {
 		name = "shallowOcean",
 		color = {0.2, 0.5, 1, 1},
-		speedMult = 0.85,
+		speedMult = 0.6,
 		threshold = 0.2,
 		threshold2 = 0.3,
 		states = {
 			-- {name="empty", weight=1000},
-			{name="combat", weight=200},
+			-- {name="combat", weight=200},
 			-- {name="shop", weight=10},
 			{name="treasure", weight=10},
 			{name="fishing", weight=1000}
@@ -20,12 +20,12 @@ biomeList = {
 	deepOceanBiome = {
 		name = "deepOcean",
 		color = {0, 0, 1, 1},
-		speedMult = 0.75,
+		speedMult = 0.6,
 		threshold = 0.2,
 		threshold2 = 1,
 		states = {
 			-- {name="empty", weight=1000},
-			{name="combat", weight=400},
+			-- {name="combat", weight=400},
 			-- {name="shop", weight=10},
 			{name="treasure", weight=25},
 			{name="fishing", weight=1000}
@@ -40,7 +40,7 @@ biomeList = {
 		threshold2 = 1,
 		states = {
 			{name="empty", weight=1000},
-			{name="combat", weight=0},
+			-- {name="combat", weight=0},
 			-- {name="shop", weight=10},
 			{name="treasure", weight=15},
 			{name="fishing", weight=0}
@@ -55,7 +55,7 @@ biomeList = {
 		threshold2 = 0.5,
 		states = {
 			{name="empty", weight=1000},
-			{name="combat", weight=100},
+			-- {name="combat", weight=100},
 			-- {name="shop", weight=10},
 			{name="treasure", weight=5},
 			{name="fishing", weight=0}
@@ -70,7 +70,7 @@ biomeList = {
 		threshold2 = 1,
 		states = {
 			{name="empty", weight=1000},
-			{name="combat", weight=150},
+			-- {name="combat", weight=150},
 			-- {name="shop", weight=10},
 			{name="treasure", weight=0},
 			{name="fishing", weight=0}
@@ -85,7 +85,7 @@ biomeList = {
 		threshold2 = 1,
 		states = {
 			{name="empty", weight=1500},
-			{name="combat", weight=75},
+			-- {name="combat", weight=75},
 			-- {name="shop", weight=10},
 			{name="treasure", weight=10},
 			{name="fishing", weight=0}
@@ -123,7 +123,7 @@ function Tile:draw()
 			love.graphics.setColor(b.color)
 		end
 	end
-	love.graphics.rectangle("fill", self.x, self.y, self.width - 0.5, self.height - 0.5)
+	love.graphics.rectangle("fill", self.x, self.y, self.width, self.height)
 
 	love.graphics.setColor(0, 0, 0, 1)
 	if self.state ~= "empty" and self.state ~= "fishing" then

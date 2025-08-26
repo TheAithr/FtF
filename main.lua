@@ -1,4 +1,4 @@
-tileSize = 25
+tileSize = 75
 love.window.setMode(1200, 900)
 
 local StateManager = require("handlers.stateManager")
@@ -29,25 +29,12 @@ function love.load()
 		Game.states[key] = stateObj
 		Game.stateManager:add(key, stateObj)
 	end
-	
-	tileX = 0
-	tileY = 0
-	tile = Game:getTile(tileX, tileY)
 
-	Game.stateManager:switch("fishing")
+	Game.stateManager:switch("explore")
 end
 
 function love.update(dt)
-	tileX = math.floor(Game.states.explore.player.x / tileSize)
-	tileY = math.floor(Game.states.explore.player.y / tileSize)
-	tile = Game:getTile(tileX, tileY)
 	Game.stateManager:update(dt)
-	
-	if Game.stateManager.current == Game.stateManager.states["explore"] then
-        local camX = Game.states.explore.player.x - windowWidth / 2
-        local camY = Game.states.explore.player.y - windowHeight / 2
-        Game.states.explore.camera:setPosition(camX, camY)
-    end
 
 	Game._cleanupTimer = (Game._cleanupTimer or 0) + dt
 	if Game._cleanupTimer > 5 then
