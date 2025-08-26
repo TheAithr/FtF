@@ -155,4 +155,11 @@ function Player:damageCalc(target)
 	end
 end
 
+function Player:healCalc()
+	if self.hp < self.stats.maxHealth[1] then
+		self.hp = math.floor(math.min(self.hp + self.stats.maxHealth[1] / 2, self.stats.maxHealth[1])* 10 + 0.5) / 10
+		self.fish = self.fish - 1
+	end
+end
+
 return Player
