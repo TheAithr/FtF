@@ -9,8 +9,6 @@ biomeList = {
 		threshold = 0.2,
 		threshold2 = 0.3,
 		states = {
-			-- {name="empty", weight=1000},
-			-- {name="shop", weight=10},
 			{name="treasure", weight=10},
 			{name="fishing", weight=1000}
 		}
@@ -23,8 +21,6 @@ biomeList = {
 		threshold = 0.2,
 		threshold2 = 1,
 		states = {
-			-- {name="empty", weight=1000},
-			-- {name="shop", weight=10},
 			{name="treasure", weight=25},
 			{name="fishing", weight=1000}
 		}
@@ -38,9 +34,7 @@ biomeList = {
 		threshold2 = 1,
 		states = {
 			{name="empty", weight=1000},
-			-- {name="shop", weight=10},
-			{name="treasure", weight=15},
-			{name="fishing", weight=0}
+			{name="treasure", weight=15}
 		}
 	},
 
@@ -52,9 +46,7 @@ biomeList = {
 		threshold2 = 0.5,
 		states = {
 			{name="empty", weight=1000},
-			-- {name="shop", weight=10},
-			{name="treasure", weight=5},
-			{name="fishing", weight=0}
+			{name="treasure", weight=5}
 		}
 	},
 
@@ -66,9 +58,7 @@ biomeList = {
 		threshold2 = 1,
 		states = {
 			{name="empty", weight=1000},
-			-- {name="shop", weight=10},
-			{name="treasure", weight=0},
-			{name="fishing", weight=0}
+			{name="treasure", weight=0}
 		}
 	},
 
@@ -80,9 +70,7 @@ biomeList = {
 		threshold2 = 1,
 		states = {
 			{name="empty", weight=1500},
-			-- {name="shop", weight=10},
-			{name="treasure", weight=10},
-			{name="fishing", weight=0}
+			{name="treasure", weight=10}
 		}
 	}
 }
@@ -127,14 +115,8 @@ function Tile:draw()
 end
 
 function Tile:behaviour()
-    if self.state == "empty" then
-		-- Do nothing
-	else
+    if self.state ~= "empty" then
 		Game.stateManager:switch(self.state)
-	end
-	if self.state == "combat" then
-		Game.states.combat.enemy.health = Game.states.combat.enemy.maxHealth
-		Game.states.explore.player.health = Game.states.explore.player.maxHealth
 	end
 end
 

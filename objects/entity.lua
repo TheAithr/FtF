@@ -168,9 +168,28 @@ end
 function Entity:checkCollidingProjectile()
 	for i,projectile in ipairs(Game.states.explore.player.projectiles) do
 		if projectile:collision(self.x, self.y, self.width, self.height) then
-			self.hp = self.hp - Game.states.explore.player.stats.damage[1]
-			table.remove(Game.states.explore.player.projectiles, I)
+			Game.states.explore.player:damageCalc(self)
+			table.remove(Game.states.explore.player.projectiles, i)
 			return "dead"
+		end
+	end
+end
+
+function Entity:damageCalc(target)
+	local critRoll = love.math.random(100)
+	local dodgeRoll = love.math.random(100)
+
+	if dodgeRoll > target.stats.dodge[1] then
+		if critRoll <= self.stats.critRate[1] then
+			target.hp = target.hp - math.floor(self.stats.critDamage[1] * (math.max(self.stats.damage[1] / ((target.stats.armor[1] / 50) + 1), 1)) * 10 + 0.5) / 10
+			if self.stats.lifesteal[1] > 0 then
+				self.hp = math.min(self.hp + self.stats.critDamage[1] * self.stats.lifesteal[1], self.stats.maxHealth[1])
+			end
+		else
+			target.hp = target.hp - math.floor(math.max(self.stats.damage[1] / ((target.stats.armor[1] / 50) + 1), 1)* 10 + 0.5) / 10
+			if self.stats.lifesteal[1] > 0 then
+				self.hp = math.min(self.hp + self.stats.lifesteal[1], self.stats.maxHealth[1])
+			end
 		end
 	end
 end

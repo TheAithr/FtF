@@ -2,25 +2,18 @@ require("game")
 
 local explore = {
 	camera = Camera.new(0, 0),
-
-	chunkSize = 16,
-	tileSize = tileSize,
 	chunks = {},
+	chunkSize = 16,
+	enemies = {},
+	player = Player.new(),
+	tilesCleared = 0,
+	tileSize = tileSize,
 	visibleTileBounds = {
 		minX = 0, 
 		maxX = 0, 
 		minY = 0, 
 		maxY = 0
-	},
-	
-	enemies = {
-		
-	},
-
-	tilesCleared = 0,
-	gold = 0,
-	
-	player = Player.new()
+	}
 }
 
 function explore:enter()
@@ -83,8 +76,6 @@ function explore:draw()
 	self:drawHealthBar(windowHeight-150)
 	
 	love.graphics.setColor(1, 1, 1, 1)
-	love.graphics.print("Gold: " .. Game.states.explore.gold, 10, 10)
-	love.graphics.print("tiles cleared: " .. Game.states.explore.tilesCleared, 10, 55)
 	love.graphics.print("XP: " .. Game.states.explore.player.xp .. "/" .. 90 + (10 * Game.states.explore.player.level), 10, 70)
 	love.graphics.print("Skillpoints: " .. Game.states.explore.player.points, 10, 85)
 end

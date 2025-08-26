@@ -118,7 +118,7 @@ function Player:checkCollidingProjectile()
 		for i,enemy in ipairs(Game.states.explore.enemies) do
 			for j,projectile in ipairs(enemy.projectiles) do
 				if projectile:collision(self.x, self.y, self.width, self.height) then
-					self.hp = self.hp - enemy.stats.damage[1]
+					enemy:damageCalc(self)
 					table.remove(enemy.projectiles, j)
 					self.immunity = 1
 					return
@@ -134,6 +134,25 @@ end
 
 function Player:checkDeath()
 	return self.hp <= 0
+end
+
+function Player:damageCalc(target)
+	local critRoll = love.math.random(100)
+	local dodgeRoll = love.math.random(100)
+
+	if dodgeRoll > target.stats.dodge[1] then
+		if critRoll <= self.stats.critRate[1] then
+			target.hp = target.hp - math.floor(self.stats.critDamage[1] * (math.max(self.stats.damage[1] / ((target.stats.armor[1] / 50) + 1), 1)) * 10 + 0.5) / 10
+			if self.stats.lifesteal[1] > 0 then
+				self.hp = math.min(self.hp + self.stats.critDamage[1] * self.stats.lifesteal[1], self.stats.maxHealth[1])
+			end
+		else
+			target.hp = target.hp - math.floor(math.max(self.stats.damage[1] / ((target.stats.armor[1] / 50) + 1), 1)* 10 + 0.5) / 10
+			if self.stats.lifesteal[1] > 0 then
+				self.hp = math.min(self.hp + self.stats.lifesteal[1], self.stats.maxHealth[1])
+			end
+		end
+	end
 end
 
 return Player
