@@ -20,7 +20,7 @@ function inventory:draw()
     love.graphics.rectangle("fill", 5, 5, math.floor(windowWidth - 10), windowHeight - 10)
     love.graphics.setColor(1, 1, 1, 1)
 
-    local statOrder = player.statOrder or {"movespeed", "maxHealth", "damage", "critRate", "critDamage", "armor", "lifesteal", "dodge"}
+    local statOrder = player.statOrder or {"movespeed", "maxHealth", "damage", "critRate", "critDamage", "armor", "lifesteal", "dodge", "attackRate"}
     local i = -1
     local tempX = 0
     local tempY = 0

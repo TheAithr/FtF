@@ -103,7 +103,9 @@ function explore:keypressed(key, scancode)
 		if tile then tile:behaviour() end
 	end
 	if scancode == "h" then
-		Game.states.explore.player:healCalc()
+		if Game.states.explore.player.fish < 0 then
+			Game.states.explore.player:healCalc()
+		end
 	end
 	if scancode == "i" then
 		Game.stateManager:switch("inventory")

@@ -21,10 +21,12 @@ function Player.new()
 		critDamage = {2, "Crit Damage", 0.1, 0},
 		armor = {0, "Armor", 0.5, 0},
 		lifesteal = {0, "Lifesteal", 0.5, 0}, 
-		dodge = {0, "Dodge Chance", 0.25, 0}
+		dodge = {0, "Dodge Chance", 0.25, 0},
+		attackRate = {3, "Attack Rate", 0.05, 0}
 	}
 
 	self.immunity = 0
+	self.attackCooldown = 0
 
 	self.projectiles = {}
 	self.team = "player"
@@ -55,6 +57,8 @@ function Player:update(dt)
 				table.remove(self.projectiles, i)
 			end
 		end
+
+		self.attackCooldown = self.attackCooldown - dt
 
 		self:checkCollidingProjectile()
 		self.immunity = self.immunity - dt
@@ -94,6 +98,7 @@ function Player:updateStats()
 	self.stats.armor[1] = 0
 	self.stats.lifesteal[1] = 0
 	self.stats.dodge[1] = 0
+	self.stats.attackRate[1] = 3
 
 	local levelCost = 90 + (10 * self.level)
 
@@ -121,6 +126,9 @@ function Player:checkCollidingProjectile()
 					enemy:damageCalc(self)
 					table.remove(enemy.projectiles, j)
 					self.immunity = 1
+					if self:checkDeath() then
+						Game.stateManager:switch("death")
+					end
 					return
 				end
 			end
@@ -129,7 +137,10 @@ function Player:checkCollidingProjectile()
 end
 
 function Player:shoot(targetX, targetY)
-	table.insert(self.projectiles, Projectile.new(self.x, self.y, 750, 5, targetX, targetY, self.team))
+	if self.attackCooldown <= 0 then
+					table.insert(self.projectiles, Projectile.new(self.x, self.y, 750, 5, targetX, targetY, self.team))
+					self.attackCooldown = 1/self.stats.attackRate[1]
+				end
 end
 
 function Player:checkDeath()

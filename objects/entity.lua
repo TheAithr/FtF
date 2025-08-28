@@ -8,8 +8,6 @@ function Entity.new(x, y)
 	self.y = y
 	self.width = 50
 	self.height = 50
-
-	self.standTimer = 0
 	
 	self.stats = {
 		movespeed =  {100, "Movespeed", 10, 0},
