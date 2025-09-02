@@ -8,32 +8,21 @@ function Player.new()
 	self.y = 0
 	self.width = 50
 	self.height = 50
+	
+	-- Velocity tracking for projectile inheritance
+	self.vx = 0
+	self.vy = 0
+	self.prevX = 0
+	self.prevY = 0
 
 	self.level = 1
 	self.xp = 0
-	self.points = 1
+	self.points = 1000
 
-	self.artifactRegister = artifactRegister.new()
+	local ArtifactManager = require("handlers.artifactManager")
+	self.artifactManager = ArtifactManager.new()
 
-	self.artifactModules = {
-		beam = "objects.artifacts.beam",
-		burst = "objects.artifacts.burst"
-		-- grimoire = "objects.artifacts.grimoire",
-		-- pistol = "objects.artifacts.pistol",
-		-- rifle = "objects.artifacts.rifle",
-		-- shotgun = "objects.artifacts.shotgun",
-		-- smg = "objects.artifacts.smg",
-		-- sniper = "objects.artifacts.sniper",
-		-- sword = "objects.artifacts.sword"
-	}
-
-	for key, path in pairs(self.artifactModules) do
-		local artifactObj = require(path)
-		self.artifactRegister.artifacts[key] = artifactObj
-		self.artifactRegister:add(key, artifactObj)
-	end
-
-	self.artifactRegister:switch("burst")
+	self.artifactManager:switch("burst")
 	
 	self.stats = {
 		movespeed = {200, "Movespeed", 20, 0},
@@ -73,6 +62,12 @@ function Player:update(dt)
 		self:checkCollidingProjectile()
 		self.immunity = self.immunity - dt
 		
+		self.artifactManager:update(dt)
+		
+		-- Store previous position for velocity calculation
+		self.prevX = self.x
+		self.prevY = self.y
+		
 		if love.keyboard.isDown("a") then
 			self.x = self.x - speed * dt
 		end
@@ -85,6 +80,20 @@ function Player:update(dt)
 		if love.keyboard.isDown("s") then
 			self.y = self.y + speed * dt
 		end
+		
+		-- Calculate velocity based on position change
+		if dt > 0 then
+			self.vx = (self.x - self.prevX) / dt
+			self.vy = (self.y - self.prevY) / dt
+		else
+			self.vx = 0
+			self.vy = 0
+		end
+		
+		if love.mouse.isDown(1) then
+			self.artifactManager:attack()
+		end
+		
 		self:updateStats()
 	end
 end
