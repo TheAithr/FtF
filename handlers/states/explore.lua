@@ -6,6 +6,7 @@ local explore = {
 	chunkSize = 16,
 	enemies = {},
 	player = Player.new(),
+	spawning = true,
 	tilesCleared = 0,
 	tileSize = tileSize,
 	visibleTileBounds = {
@@ -30,10 +31,11 @@ function explore:update(dt)
 	Game.states.explore.player:update(dt)
 
 	local roll = love.math.random(100)
-	if roll == 1 then
+	if roll == 1 
+	and self.spawning then
 		local xPos = love.math.random(Game.states.explore.player.x - 1000, Game.states.explore.player.x + 1000)
 		local yPos = love.math.random(Game.states.explore.player.y - 1000, Game.states.explore.player.y + 1000)
-		table.insert(Game.states.explore.enemies, Entity.new(xPos, yPos))
+		table.insert(Game.states.explore.enemies, Basic.new(xPos, yPos))
 	end
 
 	for i,v in ipairs(Game.states.explore.enemies) do

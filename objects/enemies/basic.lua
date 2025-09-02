@@ -1,8 +1,8 @@
-local Entity = {}
-Entity.__index = Entity
+local basic = {}
+basic.__index = basic
 
-function Entity.new(x, y)
-	local self = setmetatable({}, Entity)
+function basic.new(x, y)
+	local self = setmetatable({}, basic)
 	
 	self.x = x
 	self.y = y
@@ -57,7 +57,7 @@ function Entity.new(x, y)
 	return self
 end
 
-function Entity:update(dt)
+function basic:update(dt)
     if Game.stateManager.currentID == "explore" then
 
 		if self:checkDeath() then return "dead" end
@@ -148,7 +148,7 @@ function Entity:update(dt)
     end
 end
 
-function Entity:draw()
+function basic:draw()
 	love.graphics.rectangle("fill", self.x - self.width/2, self.y - self.height/2, self.width, self.height)
 	love.graphics.setColor(0, 0, 0, 1)
 	love.graphics.rectangle("fill", self.x + 2 - self.width/2, self.y + 2 - self.height/2, self.width - 4, self.height - 4)
@@ -159,21 +159,24 @@ function Entity:draw()
 	end
 end
 
-function Entity:shoot(targetX, targetY)
+function basic:shoot(targetX, targetY)
 	table.insert(self.projectiles, Projectile.new(self.x, self.y, 500, 5, targetX, targetY, self.team))
 end
 
-function Entity:checkCollidingProjectile()
-	for i,projectile in ipairs(Game.states.explore.player.projectiles) do
-		if projectile:collision(self.x, self.y, self.width, self.height) then
-			Game.states.explore.player:damageCalc(self)
-			table.remove(Game.states.explore.player.projectiles, i)
-			return "dead"
+function basic:checkCollidingProjectile()
+	local player = Game.states.explore.player
+	for name,artifact in pairs(player.artifactRegister.artifacts) do
+		for i,v in ipairs(artifact.projectiles) do
+			if projectile:collision(self.x, self.y, self.width, self.height) then
+				Game.states.explore.player:damageCalc(self)
+				table.remove(artifact.projectiles, num)
+				return "dead"
+			end
 		end
 	end
 end
 
-function Entity:damageCalc(target)
+function basic:damageCalc(target)
 	local critRoll = love.math.random(100)
 	local dodgeRoll = love.math.random(100)
 
@@ -192,8 +195,8 @@ function Entity:damageCalc(target)
 	end
 end
 
-function Entity:checkDeath()
+function basic:checkDeath()
 	return self.hp <= 0
 end
 
-return Entity
+return basic

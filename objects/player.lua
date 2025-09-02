@@ -12,6 +12,28 @@ function Player.new()
 	self.level = 1
 	self.xp = 0
 	self.points = 1
+
+	self.artifactRegister = artifactRegister.new()
+
+	self.artifactModules = {
+		beam = "objects.artifacts.beam",
+		burst = "objects.artifacts.burst"
+		-- grimoire = "objects.artifacts.grimoire",
+		-- pistol = "objects.artifacts.pistol",
+		-- rifle = "objects.artifacts.rifle",
+		-- shotgun = "objects.artifacts.shotgun",
+		-- smg = "objects.artifacts.smg",
+		-- sniper = "objects.artifacts.sniper",
+		-- sword = "objects.artifacts.sword"
+	}
+
+	for key, path in pairs(self.artifactModules) do
+		local artifactObj = require(path)
+		self.artifactRegister.artifacts[key] = artifactObj
+		self.artifactRegister:add(key, artifactObj)
+	end
+
+	self.artifactRegister:switch("burst")
 	
 	self.stats = {
 		movespeed = {200, "Movespeed", 20, 0},
@@ -22,13 +44,10 @@ function Player.new()
 		armor = {0, "Armor", 0.5, 0},
 		lifesteal = {0, "Lifesteal", 0.5, 0}, 
 		dodge = {0, "Dodge Chance", 0.25, 0},
-		attackRate = {3, "Attack Rate", 0.05, 0}
+		attackRate = {1, "Attack Rate", 0.05, 0}
 	}
 
 	self.immunity = 0
-	self.attackCooldown = 0
-
-	self.projectiles = {}
 	self.team = "player"
 
 	self.hp = self.stats.maxHealth[1] or 100
@@ -51,15 +70,6 @@ function Player:update(dt)
 		end
 		speed = self.stats.movespeed[1] * speedMult
 
-		for i,v in ipairs(self.projectiles) do
-			local pState = v:update(dt)
-			if pState == "dead" then
-				table.remove(self.projectiles, i)
-			end
-		end
-
-		self.attackCooldown = self.attackCooldown - dt
-
 		self:checkCollidingProjectile()
 		self.immunity = self.immunity - dt
 		
@@ -80,9 +90,6 @@ function Player:update(dt)
 end
 
 function Player:draw()
-	for i,v in ipairs(self.projectiles) do
-		v:draw()
-	end
 	love.graphics.rectangle("fill", self.x - self.width/2, self.y - self.height/2, self.width, self.height)
 	love.graphics.setColor(0, 0, 1, 1)
 	love.graphics.rectangle("fill", self.x + 2 - self.width/2, self.y + 2 - self.height/2, self.width - 4, self.height - 4)
@@ -137,10 +144,7 @@ function Player:checkCollidingProjectile()
 end
 
 function Player:shoot(targetX, targetY)
-	if self.attackCooldown <= 0 then
-					table.insert(self.projectiles, Projectile.new(self.x, self.y, 750, 5, targetX, targetY, self.team))
-					self.attackCooldown = 1/self.stats.attackRate[1]
-				end
+	
 end
 
 function Player:checkDeath()

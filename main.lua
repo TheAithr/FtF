@@ -9,7 +9,7 @@ local stateModules = {
 	combat    = "handlers.states.tileStates.combat",
     shop      = "handlers.states.tileStates.shop",
     treasure  = "handlers.states.tileStates.treasure",
-	fishing  = "handlers.states.tileStates.fishing",
+	fishing   = "handlers.states.tileStates.fishing",
 
 	inventory = "handlers.states.menuStates.inventory",
     death     = "handlers.states.menuStates.death",
