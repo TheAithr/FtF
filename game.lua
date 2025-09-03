@@ -1,10 +1,11 @@
 Button = require("objects.UI.button")
-Player = require("objects.player")
+Entity = require("objects.entities.entity")
+Player = require("objects.entities.player")
 Tile = require("objects.tile")
 Camera = require("objects.camera")
-Basic = require("objects.enemies.basic")
+Basic = require("objects.entities.enemies.basic")
 Projectile = require("objects.projectile")
-artifactRegister = require("handlers.artifactRegister")
+ProjectileManager = require("handlers.projectileManager")
 Random = require("lib.random")
 
 Game = {}

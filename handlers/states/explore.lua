@@ -6,6 +6,7 @@ local explore = {
 	chunkSize = 16,
 	enemies = {},
 	player = Player.new(),
+	projectileManager = ProjectileManager.new(),
 	spawning = true,
 	tilesCleared = 0,
 	tileSize = tileSize,
@@ -36,6 +37,33 @@ function explore:update(dt)
 		local xPos = love.math.random(Game.states.explore.player.x - 1000, Game.states.explore.player.x + 1000)
 		local yPos = love.math.random(Game.states.explore.player.y - 1000, Game.states.explore.player.y + 1000)
 		table.insert(Game.states.explore.enemies, Basic.new(xPos, yPos))
+	end
+
+	Game.states.explore.projectileManager:update(dt)
+	
+	local allEntities = {Game.states.explore.player}
+	for _, enemy in ipairs(Game.states.explore.enemies) do
+		table.insert(allEntities, enemy)
+	end
+	
+	local hitResult = Game.states.explore.projectileManager:checkCollisions(allEntities)
+	if hitResult.hit then
+		if hitResult.target then
+			hitResult.target.immunity = 1
+			if hitResult.target:checkDeath() then
+				if hitResult.target.team == "enemy" then
+					for i, enemy in ipairs(Game.states.explore.enemies) do
+						if enemy == hitResult.target then
+							table.remove(Game.states.explore.enemies, i)
+							Game.states.explore.player.xp = Game.states.explore.player.xp + 10
+							break
+						end
+					end
+				elseif hitResult.target.team == "player" then
+					Game.stateManager:switch("death")
+				end
+			end
+		end
 	end
 
 	for i,v in ipairs(Game.states.explore.enemies) do
@@ -74,6 +102,9 @@ function explore:draw()
 		v:draw()
 	end
 	Game.states.explore.player:draw()
+	
+	-- Draw all projectiles globally
+	Game.states.explore.projectileManager:draw()
 	Game.states.explore.camera:reset()
 	self:drawHealthBar(windowHeight-150)
 	
