@@ -24,9 +24,6 @@ function love.load()
 	
 	Game.stateManager = StateManager.new()
 	
-	-- Initialize save system
-	SaveSystem.init()
-	
 	for key, path in pairs(stateModules) do
 		local stateObj = require(path)
 		Game.states[key] = stateObj

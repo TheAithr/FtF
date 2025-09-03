@@ -4,8 +4,8 @@ Tile = require("objects.tile")
 Camera = require("objects.camera")
 Basic = require("objects.enemies.basic")
 Projectile = require("objects.projectile")
+artifactRegister = require("handlers.artifactRegister")
 Random = require("lib.random")
-SaveSystem = require("handlers.saveSystem")
 
 Game = {}
 Game.states = {}

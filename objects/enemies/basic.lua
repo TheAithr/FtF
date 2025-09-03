@@ -165,14 +165,12 @@ end
 
 function basic:checkCollidingProjectile()
 	local player = Game.states.explore.player
-	for name,artifact in pairs(player.artifactManager.artifacts) do
-		if artifact.projectiles then
-			for i,v in ipairs(artifact.projectiles) do
-				if v:collision(self.x, self.y, self.width, self.height) then
-					Game.states.explore.player:damageCalc(self)
-					table.remove(artifact.projectiles, i)
-					return "dead"
-				end
+	for name,artifact in pairs(player.artifactRegister.artifacts) do
+		for i,v in ipairs(artifact.projectiles) do
+			if projectile:collision(self.x, self.y, self.width, self.height) then
+				Game.states.explore.player:damageCalc(self)
+				table.remove(artifact.projectiles, num)
+				return "dead"
 			end
 		end
 	end
