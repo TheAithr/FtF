@@ -116,7 +116,7 @@ end
 
 function Tile:behaviour()
     if self.state ~= "empty" then
-		Game.stateManager:switch(self.state)
+		Game.stateManager:switch(self.state, self)
 	end
 end
 

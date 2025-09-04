@@ -1,6 +1,8 @@
 local Button = {}
 Button.__index = Button
 
+local Scaling = require("lib.scaling")
+
 local fontCache = {}
 local function getFont(size)
 	if not fontCache[size] then
@@ -9,18 +11,33 @@ local function getFont(size)
 	return fontCache[size]
 end
 
-function Button.new(x, y, width, height, text)
+function Button.new(x, y, width, height, text, useScaling)
 	local self = setmetatable({}, Button)
 
-	self.x = x
-	self.y = y
-	self.width = width
-	self.height = height
+	self.baseX = x
+	self.baseY = y
+	self.baseWidth = width
+	self.baseHeight = height
+	self.useScaling = useScaling ~= false
 	self.text = text
 	self.activated = false
 	self.hovered = false
 
+	self:updateDimensions()
+
 	return self
+end
+
+function Button:updateDimensions()
+	if self.useScaling then
+		self.width, self.height = Scaling.scaleUI(self.baseWidth, self.baseHeight)
+		self.x, self.y = Scaling.scaleCoordinates(self.baseX, self.baseY)
+	else
+		self.x = self.baseX
+		self.y = self.baseY
+		self.width = self.baseWidth
+		self.height = self.baseHeight
+	end
 end
 
 function Button:contains(x, y)
@@ -28,6 +45,8 @@ function Button:contains(x, y)
 end
 
 function Button:update()
+	self:updateDimensions()
+	
 	local mx, my = love.mouse.getPosition()
 	self.hovered = self:contains(mx, my)
 end
@@ -64,8 +83,8 @@ function Button:draw()
 	local maxWidth = self.width - paddingX * 2
 	local maxHeight = self.height - paddingY * 2
 
-	local minFontSize = 6
-	local fontSize = 32
+	local minFontSize = Scaling.getScaledFontSize(6)
+	local fontSize = Scaling.getScaledFontSize(32)
 	local font, wrappedText, wrappedLines, totalTextHeight
 
 	while fontSize >= minFontSize do

@@ -10,10 +10,10 @@ function EnemyManager.new()
     local self = setmetatable({}, EnemyManager)
 
     self.directorSpawns = {
-        {name="basic", weight=30, cost=0.8},
-        {name="light", weight=20, cost=0.75},
-        {name="heavy", weight=10, cost=2},
-        {name="boss", weight=3, cost=10}
+        {name="basic", weight=30, cost=0.8, minLevel=1},
+        {name="light", weight=20, cost=0.75, minLevel=2},
+        {name="heavy", weight=10, cost=2, minLevel=3},
+        {name="boss", weight=3, cost=10, minLevel=5}
     }
     
     self.queue = {}
@@ -53,16 +53,27 @@ end
 
 function EnemyManager:queueEnemy()
     if #self.queue <= 10 then
-        local enemyName = Random.weightedRoll(self.directorSpawns)
-        local queuedEnemy = nil
+        local playerLevel = Game.states.explore.player.level or 1
+        local availableEnemies = {}
+        
         for _, enemyData in ipairs(self.directorSpawns) do
-            if enemyData.name == enemyName then
-                queuedEnemy = enemyData
-                break
+            if playerLevel >= enemyData.minLevel then
+                table.insert(availableEnemies, enemyData)
             end
         end
-        if queuedEnemy then
-            table.insert(self.queue, queuedEnemy)
+        
+        if #availableEnemies > 0 then
+            local enemyName = Random.weightedRoll(availableEnemies)
+            local queuedEnemy = nil
+            for _, enemyData in ipairs(availableEnemies) do
+                if enemyData.name == enemyName then
+                    queuedEnemy = enemyData
+                    break
+                end
+            end
+            if queuedEnemy then
+                table.insert(self.queue, queuedEnemy)
+            end
         end
     end
 end
@@ -151,6 +162,36 @@ end
 
 function EnemyManager:getEnemies()
     return self.enemies
+end
+
+-- Get available enemy types for current player level
+function EnemyManager:getAvailableEnemyTypes()
+    local playerLevel = Game.states.explore.player.level or 1
+    local availableEnemies = {}
+    
+    for _, enemyData in ipairs(self.directorSpawns) do
+        if playerLevel >= enemyData.minLevel then
+            table.insert(availableEnemies, {
+                name = enemyData.name,
+                minLevel = enemyData.minLevel,
+                weight = enemyData.weight,
+                cost = enemyData.cost
+            })
+        end
+    end
+    
+    return availableEnemies
+end
+
+-- Update minimum level for a specific enemy type
+function EnemyManager:setEnemyMinLevel(enemyName, minLevel)
+    for _, enemyData in ipairs(self.directorSpawns) do
+        if enemyData.name == enemyName then
+            enemyData.minLevel = minLevel
+            return true
+        end
+    end
+    return false
 end
 
 return EnemyManager

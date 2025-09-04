@@ -1,39 +1,85 @@
+local Scaling = require("lib.scaling")
+
 local paused = {
-    resume = Button.new(100, 100, windowWidth - 200, windowHeight - 705, "RESUME"),
-    settings = Button.new(100, 300, windowWidth - 200, windowHeight - 705, "SETTINGS"),
-    quit = Button.new(100, 500, windowWidth - 200, windowHeight - 705, "QUIT")
+    resume = nil,
+    settings = nil,
+    quit = nil
 }
+
+function paused:updateLayout()
+    local w, h = love.graphics.getDimensions()
+    
+    local buttonWidth, buttonHeight = Scaling.scaleUI(300, 50)
+    local spacing = Scaling.scale(15)
+    
+    local totalHeight = (buttonHeight * 3) + (spacing * 2)
+    
+    local buttonX = (w - buttonWidth) / 2
+    local startY = (h - totalHeight) / 2
+    
+    self.resume = Button.new(buttonX, startY, buttonWidth, buttonHeight, "RESUME", false)
+    self.settings = Button.new(buttonX, startY + buttonHeight + spacing, buttonWidth, buttonHeight, "SETTINGS", false)
+    self.quit = Button.new(buttonX, startY + (buttonHeight + spacing) * 2, buttonWidth, buttonHeight, "QUIT", false)
+end
 
 function paused:draw()
     if Game.stateManager.previous ~= nil then
         Game.stateManager.previous:draw()
     end
+    
+    local previousFont = love.graphics.getFont()
+    
+    self:updateLayout()
+    
+    local w, h = love.graphics.getDimensions()
 
-    love.graphics.setColor(0, 0, 0, 0.5)
-    love.graphics.rectangle("fill", 0, 0, windowWidth, windowHeight)
+    love.graphics.setColor(0, 0, 0, 0.7)
+    love.graphics.rectangle("fill", 0, 0, w, h)
     love.graphics.setColor(1, 1, 1, 1)
+    
+    local fontSize = Scaling.getScaledFontSize(32)
+    local font = love.graphics.newFont(fontSize)
+    love.graphics.setFont(font)
+    
+    local title = "PAUSED"
+    local titleWidth = font:getWidth(title)
+    love.graphics.print(title, (w - titleWidth) / 2, Scaling.scale(100))
+    
+    love.graphics.setFont(previousFont)
 
-    Game.states.paused.resume:draw()
-    Game.states.paused.settings:draw()
-    Game.states.paused.quit:draw()
+    if self.resume then
+        self.resume:draw()
+    end
+    if self.settings then
+        self.settings:draw()
+    end
+    if self.quit then
+        self.quit:draw()
+    end
 end
 
 function paused:mousepressed(x, y, button)
-    if Game.states.paused.resume:mousepressed(x, y, button) then
-        paused:resumeFunc()
+    if self.resume and self.resume:mousepressed(x, y, button) then
+        self:resumeFunc()
     end
-    if Game.states.paused.settings:mousepressed(x, y, button) then
-        paused:settingsFunc()
+    if self.settings and self.settings:mousepressed(x, y, button) then
+        self:settingsFunc()
     end
-    if Game.states.paused.quit:mousepressed(x, y, button) then
-        paused:quitFunc()
+    if self.quit and self.quit:mousepressed(x, y, button) then
+        self:quitFunc()
     end
 end
 
+function paused:mousereleased(x, y, button)
+    if self.resume then self.resume:mousereleased(x, y, button) end
+    if self.settings then self.settings:mousereleased(x, y, button) end
+    if self.quit then self.quit:mousereleased(x, y, button) end
+end
+
 function paused:keypressed(key, scancode)
-	if scancode == "escape" then
-        paused:resumeFunc()
-	end
+    if scancode == "escape" then
+        self:resumeFunc()
+    end
 end
 
 function paused:resumeFunc()

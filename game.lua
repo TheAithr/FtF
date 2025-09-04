@@ -1,4 +1,5 @@
 Button = require("objects.UI.button")
+Scaling = require("lib.scaling")
 Entity = require("objects.entities.entity")
 Player = require("objects.entities.player")
 Tile = require("objects.tile")

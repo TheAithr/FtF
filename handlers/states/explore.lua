@@ -1,4 +1,5 @@
 require("game")
+local Scaling = require("lib.scaling")
 
 local explore = {
 	camera = Camera.new(0, 0),
@@ -25,12 +26,14 @@ function explore:enter()
 	end
 end
 
-function explore:update(dt)	
-	Game.states.explore.visibleTileBounds.minX = math.floor(Game.states.explore.camera.x / tileSize)
-	Game.states.explore.visibleTileBounds.maxX = math.ceil((Game.states.explore.camera.x + windowWidth) / tileSize)
-	Game.states.explore.visibleTileBounds.minY = math.floor(Game.states.explore.camera.y / tileSize)
-	Game.states.explore.visibleTileBounds.maxY = math.ceil((Game.states.explore.camera.y + windowHeight) / tileSize)
-	Game.states.explore.camera:centerOn(Game.states.explore.player.x, Game.states.explore.player.y, windowWidth, windowHeight)
+function explore:update(dt)
+	local currentWindowWidth, currentWindowHeight = love.graphics.getDimensions()
+	
+	Game.states.explore.visibleTileBounds.minX = math.floor(Game.states.explore.camera.x / tileSize) - 2
+	Game.states.explore.visibleTileBounds.maxX = math.ceil((Game.states.explore.camera.x + currentWindowWidth) / tileSize) + 2
+	Game.states.explore.visibleTileBounds.minY = math.floor(Game.states.explore.camera.y / tileSize) - 2
+	Game.states.explore.visibleTileBounds.maxY = math.ceil((Game.states.explore.camera.y + currentWindowHeight) / tileSize) + 2
+	Game.states.explore.camera:centerOn(Game.states.explore.player.x, Game.states.explore.player.y)
 
 	Game.states.explore.player:update(dt)
 
@@ -94,17 +97,22 @@ function explore:draw()
 	
 	Game.states.explore.projectileManager:draw()
 	Game.states.explore.camera:reset()
-	self:drawHealthBar(windowHeight-150)
+	local currentWindowWidth, currentWindowHeight = love.graphics.getDimensions()
+	self:drawHealthBar()
 	
 	love.graphics.setColor(1, 1, 1, 1)
-	love.graphics.print("XP: " .. Game.states.explore.player.xp .. "/" .. 90 + (10 * Game.states.explore.player.level), 10, 70)
-	love.graphics.print("Skillpoints: " .. Game.states.explore.player.points, 10, 85)
+	local fontSize = Scaling.getScaledFontSize(12)
+	local font = love.graphics.newFont(fontSize)
+	love.graphics.setFont(font)
+	love.graphics.print("XP: " .. Game.states.explore.player.xp .. "/" .. 90 + (10 * Game.states.explore.player.level), Scaling.scale(10), Scaling.scale(70))
+	love.graphics.print("Skillpoints: " .. Game.states.explore.player.points, Scaling.scale(10), Scaling.scale(85))
 end
 
 function explore:drawHealthBar(hp, maxHp, y)
-	local w, h = 300, 20 
-	local x = (windowWidth - w) / 2
-	local y = windowHeight-150
+	local currentWindowWidth, currentWindowHeight = love.graphics.getDimensions()
+	local w, h = Scaling.scaleUI(300, 20)
+	local x = (currentWindowWidth - w) / 2
+	local y = currentWindowHeight - Scaling.scale(150)
 	local percent = math.max(Game.states.explore.player.hp/Game.states.explore.player.stats.maxHealth[1], 0)
 
 	love.graphics.setColor(0.2,0.2,0.2,1)
@@ -124,7 +132,7 @@ function explore:keypressed(key, scancode)
 		if tile then tile:behaviour() end
 	end
 	if scancode == "h" then
-		if Game.states.explore.player.fish < 0 then
+		if Game.states.explore.player.fish > 0 then
 			Game.states.explore.player:healCalc()
 		end
 	end

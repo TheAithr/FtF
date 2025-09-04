@@ -1,12 +1,21 @@
 tileSize = 75
-love.window.setMode(1200, 900)
+
+love.window.setMode(1200, 900, {
+    resizable = true,
+    minwidth = 800,
+    minheight = 600
+})
+
+windowWidth, windowHeight = love.graphics.getDimensions()
+
+baseWidth, baseHeight = 1200, 900
+scaleFactor = 1
 
 local StateManager = require("handlers.stateManager")
 	
 local stateModules = {
 	explore   = "handlers.states.explore",
 
-	combat    = "handlers.states.tileStates.combat",
     shop      = "handlers.states.tileStates.shop",
     treasure  = "handlers.states.tileStates.treasure",
 	fishing   = "handlers.states.tileStates.fishing",
@@ -17,8 +26,15 @@ local stateModules = {
     settings  = "handlers.states.menuStates.settings"
 }
 
+function love.resize(w, h)
+    windowWidth, windowHeight = w, h
+    scaleFactor = math.min(windowWidth / baseWidth, windowHeight / baseHeight)
+    
+    tileSize = 75
+end
+
 function love.load()
-	windowWidth, windowHeight = love.graphics.getDimensions()
+    love.resize(love.graphics.getDimensions())
 
 	require("game")
 	

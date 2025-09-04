@@ -73,7 +73,7 @@ function Entity:shoot(targetX, targetY)
         if Game.states.explore and Game.states.explore.projectileManager then
             Game.states.explore.projectileManager:addProjectile(
                 self.x, self.y, 500, 5, targetX, targetY, self.team,
-                self.stats.damage[1], self.stats.critRate[1], self.stats.critDamage[1]
+                self.stats.damage[1], self.stats.critRate[1], self.stats.critDamage[1], self.id
             )
         else
             table.insert(self.projectiles, Projectile.new(
@@ -128,16 +128,18 @@ function Entity:damageCalc(target)
         if critRoll <= self.stats.critRate[1] then
             finalDamage = math.floor(self.stats.critDamage[1] * baseDamage * 10 + 0.5) / 10
             if self.stats.lifesteal[1] > 0 then
+                local healAmount = self.stats.critDamage[1] * self.stats.lifesteal[1]
                 self.hp = math.min(
-                    self.hp + self.stats.critDamage[1] * self.stats.lifesteal[1], 
+                    self.hp + healAmount, 
                     self.stats.maxHealth[1]
                 )
             end
         else
             finalDamage = math.floor(baseDamage * 10 + 0.5) / 10
             if self.stats.lifesteal[1] > 0 then
+                local healAmount = self.stats.lifesteal[1]
                 self.hp = math.min(
-                    self.hp + self.stats.lifesteal[1], 
+                    self.hp + healAmount, 
                     self.stats.maxHealth[1]
                 )
             end

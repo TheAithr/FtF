@@ -1,8 +1,9 @@
 require("game")
+local Scaling = require("lib.scaling")
 
 local fishing = {
-    start = Button.new(250, 400, 300, 100, "FISH"),
-    exit = Button.new(windowWidth - 55, 5, 50, 25, "EXIT"),
+    start = nil,
+    exit = nil,
 
     fish = {
         speed = 300,
@@ -12,7 +13,7 @@ local fishing = {
     bar = {
         top = 20,
         bottom = 70,
-        speed =  100
+        speed =  200
     },
     isFishing = false,
     queueResetTimer = false,
@@ -20,23 +21,43 @@ local fishing = {
     timer = 0
 }
 
+function fishing:updateLayout()
+    local w, h = love.graphics.getDimensions()
+    
+    local exitSize = Scaling.scale(50)
+    self.exit = Button.new(w - exitSize - Scaling.scale(10), Scaling.scale(10), exitSize, exitSize * 0.5, "EXIT", false)
+end
+
 function fishing:draw()
+    self:updateLayout()
+    
     local fishing = Game.states.fishing
-    love.graphics.rectangle("line", 10, 10, 40, windowHeight - 20)
-    love.graphics.rectangle("fill", 10, fishing.bar.top, 40, fishing.bar.bottom - fishing.bar.top)
+    local w, h = love.graphics.getDimensions()
+    
+    local fontSize = Scaling.getScaledFontSize(12)
+    local font = love.graphics.newFont(fontSize)
+    love.graphics.setFont(font)
+    
+    local barWidth = Scaling.scale(40)
+    local barMargin = Scaling.scale(10)
+    love.graphics.rectangle("line", barMargin, barMargin, barWidth, h - barMargin * 2)
+    love.graphics.rectangle("fill", barMargin, fishing.bar.top, barWidth, fishing.bar.bottom - fishing.bar.top)
 
     for i,v in ipairs(fishing.fish.table) do
         if v ~= nil then
-            love.graphics.rectangle("fill", v.x - 10, v.y - 10, 20, 20)
+            local fishSize = Scaling.scale(20)
+            love.graphics.rectangle("fill", v.x - fishSize/2, v.y - fishSize/2, fishSize, fishSize)
         end
     end
 
-    fishing.exit:draw()
+    if self.exit then
+        self.exit:update()
+        self.exit:draw()
+    end
 end
 
 function fishing:enter()
     local fishing = Game.states.fishing
-    fishing.bar.speed = Game.states.explore.player.stats.movespeed[1] / 2
 end
 
 function fishing:update(dt)
@@ -72,22 +93,21 @@ function fishing:update(dt)
         fishing.bar.bottom = math.max(fishing.bar.bottom - (fishing.bar.speed * dt), 70)
     end
     if love.keyboard.isDown("s") then
-        fishing.bar.top = math.min(fishing.bar.top + (fishing.bar.speed * dt), windowHeight - 70)
-        fishing.bar.bottom = math.min(fishing.bar.bottom + (fishing.bar.speed * dt), windowHeight - 20)
+        local w, h = love.graphics.getDimensions()
+        fishing.bar.top = math.min(fishing.bar.top + (fishing.bar.speed * dt), h - Scaling.scale(70))
+        fishing.bar.bottom = math.min(fishing.bar.bottom + (fishing.bar.speed * dt), h - Scaling.scale(20))
     end
 end
 
 function fishing:mousepressed(x, y, button)
-    if Game.states.fishing.exit:mousepressed(x, y, button) then
+    if self.exit and self.exit:mousepressed(x, y, button) then
 		Game.stateManager:switch("explore")
 	end
-    if Game.states.fishing.start:mousepressed(x, y, button) then
-        
-    end
 end
 
 function fishing:mousereleased(x, y, button)
-    
+    if self.exit then self.exit:mousereleased(x, y, button) end
+    if self.start then self.start:mousereleased(x, y, button) end
 end
 
 function fishing:keypressed(key, scancode)
@@ -103,8 +123,9 @@ end
 function fishing:newFish()
     local fishing = Game.states.fishing
     if #fishing.fish.table < fishing.fish.cap then
-        local yPos = love.math.random(20, windowHeight - 20)
-        local xPos = windowWidth - 30
+        local w, h = love.graphics.getDimensions()
+        local yPos = love.math.random(Scaling.scale(20), h - Scaling.scale(20))
+        local xPos = w - Scaling.scale(30)
         table.insert(fishing.fish.table, {x=xPos, y=yPos, speed=fishing.fish.speed})
     end
 end
