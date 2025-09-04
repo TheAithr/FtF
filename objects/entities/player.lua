@@ -8,7 +8,7 @@ function Player.new()
     
     self.level = 1
     self.xp = 0
-    self.points = 1
+    self.points = self.level
     self.fish = 0
     
     self.stats.movespeed = {200, "Movespeed", 20, 0}
@@ -43,6 +43,14 @@ function Player:update(dt)
         end
         if love.keyboard.isDown("s") then
             self.y = self.y + speed * dt
+        end
+        
+        if love.mouse.isDown(1) then
+            local mX = love.mouse.getX()
+            local mY = love.mouse.getY()
+            local worldX = mX + Game.states.explore.camera.x
+            local worldY = mY + Game.states.explore.camera.y
+            self:shoot(worldX, worldY)
         end
         
         if state == "dead" then

@@ -2,14 +2,18 @@ local EnemyManager = {}
 EnemyManager.__index = EnemyManager
 
 local Basic = require("objects.entities.enemies.basic")
-local Fast = require("objects.entities.enemies.fast")
+local Light = require("objects.entities.enemies.light")
+local Heavy = require("objects.entities.enemies.heavy")
+local Boss = require("objects.entities.enemies.boss")
 
 function EnemyManager.new()
     local self = setmetatable({}, EnemyManager)
 
     self.directorSpawns = {
-        {name="basic", weight=3, cost=0.8},
-        {name="fast", weight=2, cost=0.75}
+        {name="basic", weight=30, cost=0.8},
+        {name="light", weight=20, cost=0.75},
+        {name="heavy", weight=10, cost=2},
+        {name="boss", weight=3, cost=10}
     }
     
     self.queue = {}
@@ -63,13 +67,75 @@ function EnemyManager:queueEnemy()
     end
 end
 
+function EnemyManager:checkEntityCollision(x, y, width, height, excludeEntity)
+    for _, enemy in ipairs(self.enemies) do
+        if enemy ~= excludeEntity then
+            local dx = math.abs(x - enemy.x)
+            local dy = math.abs(y - enemy.y)
+            local minDistX = (width + enemy.width) / 2
+            local minDistY = (height + enemy.height) / 2
+            
+            if dx < minDistX and dy < minDistY then
+                return true
+            end
+        end
+    end
+    
+    local player = Game.states.explore.player
+    if player and player ~= excludeEntity then
+        local dx = math.abs(x - player.x)
+        local dy = math.abs(y - player.y)
+        local minDistX = (width + player.width) / 2
+        local minDistY = (height + player.height) / 2
+        
+        if dx < minDistX and dy < minDistY then
+            return true
+        end
+    end
+    
+    return false
+end
+
+function EnemyManager:findSafeSpawnPosition(queuedEnemy)
+    local attempts = 0
+    local maxAttempts = 50
+    local width, height = 50, 50
+    
+    if queuedEnemy.name == "light" then
+        width, height = 40, 40
+    elseif queuedEnemy.name == "heavy" then
+        width, height = 60, 60
+    elseif queuedEnemy.name == "boss" then
+        width, height = 100, 100
+    end
+    
+    while attempts < maxAttempts do
+        local xPos = love.math.random(Game.states.explore.player.x - 1000, Game.states.explore.player.x + 1000)
+        local yPos = love.math.random(Game.states.explore.player.y - 1000, Game.states.explore.player.y + 1000)
+        
+        if not self:checkEntityCollision(xPos, yPos, width, height, nil) then
+            return xPos, yPos
+        end
+        
+        attempts = attempts + 1
+    end
+    
+    local angle = love.math.random() * 2 * math.pi
+    local distance = 1200
+    return Game.states.explore.player.x + math.cos(angle) * distance,
+           Game.states.explore.player.y + math.sin(angle) * distance
+end
+
 function EnemyManager:queuedEnemytoRealEnemy(queuedEnemy)
-    local xPos = love.math.random(Game.states.explore.player.x - 1000, Game.states.explore.player.x + 1000)
-	local yPos = love.math.random(Game.states.explore.player.y - 1000, Game.states.explore.player.y + 1000)
+    local xPos, yPos = self:findSafeSpawnPosition(queuedEnemy)
     if queuedEnemy.name == "basic" then
         return Basic.new(xPos, yPos)
-    elseif queuedEnemy.name == "fast" then
-        return Fast.new(xPos, yPos)
+    elseif queuedEnemy.name == "light" then
+        return Light.new(xPos, yPos)
+    elseif queuedEnemy.name == "heavy" then
+        return Heavy.new(xPos, yPos)
+    elseif queuedEnemy.name == "boss" then
+        return Boss.new(xPos, yPos)
     end
 end
 

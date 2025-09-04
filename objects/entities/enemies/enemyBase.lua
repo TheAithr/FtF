@@ -77,8 +77,15 @@ function EnemyBase:wanderBehavior(dt, speed)
     if dist > 2 then
         local dirX = diffX / dist
         local dirY = diffY / dist
-        self.x = self.x + dirX * speed * dt
-        self.y = self.y + dirY * speed * dt
+        local newX = self.x + dirX * speed * dt
+        local newY = self.y + dirY * speed * dt
+        
+        if not self:checkCollisionAtPosition(newX, newY) then
+            self.x = newX
+            self.y = newY
+        else
+            self.wanderPos = {0, 0}
+        end
     else
         self.wanderPos = {0, 0}
     end
@@ -92,13 +99,37 @@ function EnemyBase:huntBehavior(dt, speed, player)
     if dist > 0 then
         local dirX = diffX / dist
         local dirY = diffY / dist
-        self.x = self.x + dirX * speed * dt
-        self.y = self.y + dirY * speed * dt
+        local newX = self.x + dirX * speed * dt
+        local newY = self.y + dirY * speed * dt
+        
+        if not self:checkCollisionAtPosition(newX, newY) then
+            self.x = newX
+            self.y = newY
+        else
+            local altAngle = math.atan2(dirY, dirX) + (love.math.random() > 0.5 and math.pi/4 or -math.pi/4)
+            local altDirX = math.cos(altAngle)
+            local altDirY = math.sin(altAngle)
+            local altX = self.x + altDirX * speed * dt * 0.5
+            local altY = self.y + altDirY * speed * dt * 0.5
+            
+            if not self:checkCollisionAtPosition(altX, altY) then
+                self.x = altX
+                self.y = altY
+            end
+        end
     end
     
     if dist <= 1000 and self.attackCooldown <= 0 then
         self:shoot(player.x, player.y)
     end
+end
+
+function EnemyBase:checkCollisionAtPosition(newX, newY)
+    -- Check collision with all entities through the enemy manager
+    if Game.states.explore and Game.states.explore.enemyManager then
+        return Game.states.explore.enemyManager:checkEntityCollision(newX, newY, self.width, self.height, self)
+    end
+    return false
 end
 
 function EnemyBase:draw()

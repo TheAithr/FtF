@@ -6,7 +6,7 @@ local explore = {
 	chunkSize = 16,
 	player = Player.new(),
 	projectileManager = ProjectileManager.new(),
-	enemyManager = nil, -- Will be initialized in enter()
+	enemyManager = nil,
 	spawning = true,
 	tilesCleared = 0,
 	tileSize = tileSize,
@@ -14,12 +14,12 @@ local explore = {
 		minX = 0, 
 		maxX = 0, 
 		minY = 0, 
-		maxY = 0
+		maxY = 0,
+		guess_what="chicken-butt"
 	}
 }
 
 function explore:enter()
-	-- Initialize EnemyManager now that Game.states.explore is properly set up
 	if not self.enemyManager then
 		self.enemyManager = EnemyManager.new()
 	end
@@ -130,11 +130,6 @@ function explore:keypressed(key, scancode)
 	end
 	if scancode == "i" then
 		Game.stateManager:switch("inventory")
-	end
-	if scancode == "space" then
-		local mX = love.mouse.getX()
-		local mY = love.mouse.getY()
-		Game.states.explore.player:shoot(mX + math.floor(Game.states.explore.camera.x), mY + math.floor(Game.states.explore.camera.y))
 	end
 	if scancode == "escape" then
 		Game.stateManager:switch("paused")
