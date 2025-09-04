@@ -3,7 +3,7 @@ Player.__index = Player
 setmetatable(Player, Entity)
 
 function Player.new()
-    local self = Entity.new(0, 0, "player", "player")
+    local self = Entity.new(0, 0, 50, 50, "player", "player")
     setmetatable(self, Player)
     
     self.level = 1

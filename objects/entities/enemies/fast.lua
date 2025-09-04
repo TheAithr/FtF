@@ -1,14 +1,14 @@
 local EnemyBase = require("objects.entities.enemies.enemyBase")
 
-local Basic = {}
-Basic.__index = Basic
-setmetatable(Basic, EnemyBase)
+local Fast = {}
+Fast.__index = Fast
+setmetatable(Fast, EnemyBase)
 
-function Basic.new(x, y)
-    local self = EnemyBase.new(x, y, 50, 50, "basic")
-    setmetatable(self, Basic)
+function Fast.new(x, y)
+    local self = EnemyBase.new(x, y, 40, 40, "fast")
+    setmetatable(self, Fast)
     
-    self.stats.movespeed = {100, "Movespeed", 10, 0}
+    self.stats.movespeed = {200, "Movespeed", 20, 0}
     self.stats.maxHealth = {10, "Max Health", 1, 0}
     self.stats.damage = {10, "Base Damage", 1, 0}
     self.stats.critRate = {0, "Crit Chance", 1, 0}
@@ -23,7 +23,7 @@ function Basic.new(x, y)
     return self
 end
 
-function Basic:draw()
+function Fast:draw()
     love.graphics.setColor(1, 1, 1, 1)
     love.graphics.rectangle("fill", self.x - self.width/2, self.y - self.height/2, self.width, self.height)
     love.graphics.setColor(0.8, 0.2, 0.2, 1)
@@ -35,4 +35,4 @@ function Basic:draw()
     end
 end
 
-return Basic
+return Fast

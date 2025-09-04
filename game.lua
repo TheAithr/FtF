@@ -3,9 +3,9 @@ Entity = require("objects.entities.entity")
 Player = require("objects.entities.player")
 Tile = require("objects.tile")
 Camera = require("objects.camera")
-Basic = require("objects.entities.enemies.basic")
 Projectile = require("objects.projectile")
 ProjectileManager = require("handlers.projectileManager")
+EnemyManager = require("handlers.enemyManager")
 Random = require("lib.random")
 
 Game = {}

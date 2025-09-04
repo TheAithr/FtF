@@ -1,23 +1,19 @@
 local Entity = {}
 Entity.__index = Entity
 
-function Entity.new(x, y, team, entityType)
+function Entity.new(x, y, width, height, team, entityType)
     local self = setmetatable({}, Entity)
     
-    -- Position and dimensions
     self.x = x or 0
     self.y = y or 0
-    self.width = 50
-    self.height = 50
+    self.width = width or 50
+    self.height = height or 50
     
-    -- Team and type identification
     self.team = team or "neutral"
     self.entityType = entityType or "basic"
     
-    -- Unique ID for tracking projectile creators
     self.id = love.math.random() * 1000000
     
-    -- Base stats structure - all entities share these
     self.stats = {
         movespeed = {200, "Movespeed", 20, 0},
         maxHealth = {100, "Max Health", 10, 0},
@@ -30,11 +26,9 @@ function Entity.new(x, y, team, entityType)
         attackRate = {1, "Attack Rate", 0.05, 0}
     }
     
-    -- Health and status
     self.hp = self.stats.maxHealth[1]
     self.immunity = 0
     
-    -- Combat
     self.projectiles = {}
     self.attackCooldown = 0
     
@@ -42,13 +36,10 @@ function Entity.new(x, y, team, entityType)
 end
 
 function Entity:update(dt)
-    -- Update immunity frames
     self.immunity = math.max(0, self.immunity - dt)
     
-    -- Update attack cooldown
     self.attackCooldown = math.max(0, self.attackCooldown - dt)
     
-    -- Update local projectiles (for backward compatibility)
     for i = #self.projectiles, 1, -1 do
         local projectile = self.projectiles[i]
         local state = projectile:update(dt)
@@ -57,25 +48,21 @@ function Entity:update(dt)
         end
     end
     
-    -- Update stats (can be overridden by subclasses)
     self:updateStats()
     
     return self:checkDeath() and "dead" or "alive"
 end
 
 function Entity:draw()
-    -- Draw entity body (can be overridden by subclasses)
     love.graphics.setColor(1, 1, 1, 1)
     love.graphics.rectangle("fill", self.x - self.width/2, self.y - self.height/2, self.width, self.height)
     
-    -- Draw projectiles
     for _, projectile in ipairs(self.projectiles) do
         projectile:draw()
     end
 end
 
 function Entity:updateStats()
-    -- Base stat update - can be overridden by subclasses
     for stat, base in pairs(self.stats) do
         self.stats[stat][1] = base[1] + (base[3] * base[4])
     end
@@ -83,14 +70,12 @@ end
 
 function Entity:shoot(targetX, targetY)
     if self.attackCooldown <= 0 then
-        -- Use global projectile manager if available, otherwise fallback to local
         if Game.states.explore and Game.states.explore.projectileManager then
             Game.states.explore.projectileManager:addProjectile(
                 self.x, self.y, 500, 5, targetX, targetY, self.team,
                 self.stats.damage[1], self.stats.critRate[1], self.stats.critDamage[1]
             )
         else
-            -- Fallback to local projectile storage
             table.insert(self.projectiles, Projectile.new(
                 self.x, self.y, 500, 5, targetX, targetY, self.team,
                 self.stats.damage[1], self.stats.critRate[1], self.stats.critDamage[1]
@@ -102,7 +87,6 @@ end
 
 function Entity:checkCollidingProjectile()
     if self.immunity <= 0 then
-        -- Check against enemy projectiles if we're a player
         if self.team == "player" then
             for i, enemy in ipairs(Game.states.explore.enemies or {}) do
                 for j, projectile in ipairs(enemy.projectiles) do
@@ -114,7 +98,6 @@ function Entity:checkCollidingProjectile()
                     end
                 end
             end
-        -- Check against player projectiles if we're an enemy
         elseif self.team == "enemy" then
             local player = Game.states.explore.player
             if player and player.projectiles then
@@ -143,7 +126,6 @@ function Entity:damageCalc(target)
         
         local finalDamage
         if critRoll <= self.stats.critRate[1] then
-            -- Critical hit
             finalDamage = math.floor(self.stats.critDamage[1] * baseDamage * 10 + 0.5) / 10
             if self.stats.lifesteal[1] > 0 then
                 self.hp = math.min(
@@ -152,7 +134,6 @@ function Entity:damageCalc(target)
                 )
             end
         else
-            -- Normal hit
             finalDamage = math.floor(baseDamage * 10 + 0.5) / 10
             if self.stats.lifesteal[1] > 0 then
                 self.hp = math.min(
@@ -166,7 +147,7 @@ function Entity:damageCalc(target)
         return finalDamage
     end
     
-    return 0 -- Dodged
+    return 0 
 end
 
 function Entity:checkDeath()

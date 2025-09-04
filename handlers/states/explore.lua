@@ -4,9 +4,9 @@ local explore = {
 	camera = Camera.new(0, 0),
 	chunks = {},
 	chunkSize = 16,
-	enemies = {},
 	player = Player.new(),
 	projectileManager = ProjectileManager.new(),
+	enemyManager = nil, -- Will be initialized in enter()
 	spawning = true,
 	tilesCleared = 0,
 	tileSize = tileSize,
@@ -19,7 +19,10 @@ local explore = {
 }
 
 function explore:enter()
-
+	-- Initialize EnemyManager now that Game.states.explore is properly set up
+	if not self.enemyManager then
+		self.enemyManager = EnemyManager.new()
+	end
 end
 
 function explore:update(dt)	
@@ -31,19 +34,17 @@ function explore:update(dt)
 
 	Game.states.explore.player:update(dt)
 
-	local roll = love.math.random(100)
-	if roll == 1 
-	and self.spawning then
-		local xPos = love.math.random(Game.states.explore.player.x - 1000, Game.states.explore.player.x + 1000)
-		local yPos = love.math.random(Game.states.explore.player.y - 1000, Game.states.explore.player.y + 1000)
-		table.insert(Game.states.explore.enemies, Basic.new(xPos, yPos))
+	if Game.states.explore.enemyManager then
+		Game.states.explore.enemyManager:update(dt)
 	end
 
 	Game.states.explore.projectileManager:update(dt)
 	
 	local allEntities = {Game.states.explore.player}
-	for _, enemy in ipairs(Game.states.explore.enemies) do
-		table.insert(allEntities, enemy)
+	if Game.states.explore.enemyManager then
+		for _, enemy in ipairs(Game.states.explore.enemyManager:getEnemies()) do
+			table.insert(allEntities, enemy)
+		end
 	end
 	
 	local hitResult = Game.states.explore.projectileManager:checkCollisions(allEntities)
@@ -52,25 +53,13 @@ function explore:update(dt)
 			hitResult.target.immunity = 1
 			if hitResult.target:checkDeath() then
 				if hitResult.target.team == "enemy" then
-					for i, enemy in ipairs(Game.states.explore.enemies) do
-						if enemy == hitResult.target then
-							table.remove(Game.states.explore.enemies, i)
-							Game.states.explore.player.xp = Game.states.explore.player.xp + 10
-							break
-						end
+					if Game.states.explore.enemyManager and Game.states.explore.enemyManager:removeEnemy(hitResult.target) then
+						Game.states.explore.player.xp = Game.states.explore.player.xp + 10
 					end
 				elseif hitResult.target.team == "player" then
 					Game.stateManager:switch("death")
 				end
 			end
-		end
-	end
-
-	for i,v in ipairs(Game.states.explore.enemies) do
-		local enemyState = v:update(dt)
-		if enemyState == "dead" then
-			table.remove(Game.states.explore.enemies, i)
-			Game.states.explore.player.xp = Game.states.explore.player.xp + 10
 		end
 	end
 
@@ -98,12 +87,11 @@ function explore:draw()
 		end
 	end
 	
-	for i,v in ipairs(Game.states.explore.enemies) do
-		v:draw()
+	if Game.states.explore.enemyManager then
+		Game.states.explore.enemyManager:draw()
 	end
 	Game.states.explore.player:draw()
 	
-	-- Draw all projectiles globally
 	Game.states.explore.projectileManager:draw()
 	Game.states.explore.camera:reset()
 	self:drawHealthBar(windowHeight-150)

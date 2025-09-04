@@ -2,8 +2,8 @@ local EnemyBase = {}
 EnemyBase.__index = EnemyBase
 setmetatable(EnemyBase, Entity)
 
-function EnemyBase.new(x, y, enemyType)
-    local self = Entity.new(x or 0, y or 0, "enemy", enemyType or "basic")
+function EnemyBase.new(x, y, width, height, enemyType)
+    local self = Entity.new(x or 0, y or 0, width or 50, height or 50, "enemy", enemyType or "basic")
     setmetatable(self, EnemyBase)
     
     self.AI = "wander"
